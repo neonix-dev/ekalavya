@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ekalavya — The Silent Mirror</title>
+<meta name="description" content="Play. The mirror listens. Ekalavya identifies the raga in your playing — silently, in real time.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #f5f0e8;
+  --bg-subtle: #ece6db;
+  --surface: #ffffff;
+  --border: #d5cdbf;
+  --border-light: #e5ddd0;
+  --text: #2a2520;
+  --text-dim: #7a7168;
+  --text-faint: #a89f93;
+  --accent: #8b5e34;
+  --accent-glow: rgba(139, 94, 52, 0.1);
+  --accent-dim: #a67c52;
+  --swara-active: #8b5e34;
+  --swara-inactive: #d5cdbf;
+}
+
+html { font-size: 16px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+header {
+  text-align: center;
+  padding: 3rem 0 2rem;
+}
+
+h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: 3.5rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.tagline {
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.beta-tag {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent-dim);
+  border: 1px solid var(--accent-dim);
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  opacity: 0.7;
+}
+
+.sa-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 2.5rem 0;
+}
+
+.sa-selector label {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.sa-selector select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+}
+
+.sa-selector select:focus { border-color: var(--accent); }
+
+.midi-status {
+  text-align: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--text-faint);
+  margin-bottom: 2rem;
+  min-height: 1.2rem;
+}
+.midi-status.connected { color: var(--accent); }
+.midi-status.error { color: #a05050; }
+
+/* ── Mirror ── */
+.mirror {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 2.5rem 2rem;
+  margin-bottom: 2rem;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.mirror::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-dim), transparent);
+  opacity: 0.2;
+}
+
+.swara-grid {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.swara-node {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 400;
+  border: 1px solid var(--swara-inactive);
+  color: var(--text-faint);
+  transition: all 0.3s ease;
+  position: relative;
+  background: var(--bg);
+}
+
+.swara-node.active {
+  border-color: var(--swara-active);
+  color: var(--accent);
+  background: var(--accent-glow);
+  box-shadow: 0 0 15px rgba(139,94,52,0.08);
+}
+
+.swara-node.playing {
+  transform: scale(1.15);
+  box-shadow: 0 0 25px rgba(139,94,52,0.15);
+}
+
+.swara-node .count {
+  position: absolute;
+  bottom: -4px;
+  right: -2px;
+  font-size: 0.55rem;
+  font-family: 'DM Mono', monospace;
+  color: var(--accent-dim);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.swara-node.active .count { opacity: 1; }
+
+.raga-result {
+  text-align: center;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.raga-result .waiting {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.raga-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 300;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.5s ease;
+}
+.raga-name.visible { opacity: 1; transform: translateY(0); }
+
+.raga-swaras {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  opacity: 0;
+  transition: opacity 0.5s ease 0.1s;
+}
+.raga-swaras.visible { opacity: 1; }
+
+.raga-thaat {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-top: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.5s ease 0.2s;
+}
+.raga-thaat.visible { opacity: 1; }
+
+.raga-candidates {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.candidate-tag {
+  font-size: 0.65rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+}
+.candidate-tag.top { border-color: var(--accent); color: var(--accent); }
+
+/* ── Piano ── */
+.keyboard-section { margin-bottom: 1rem; }
+
+.keyboard-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+.piano-container {
+  background: #2a2520;
+  border-radius: 8px;
+  padding: 16px 16px 8px 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.piano {
+  position: relative;
+  margin: 0 auto;
+  user-select: none;
+}
+
+.piano .wk {
+  position: absolute;
+  top: 0;
+  width: 48px;
+  height: 160px;
+  background: linear-gradient(to bottom, #f8f8f8, #fff 15%, #fff 85%, #e8e8e8);
+  border: 1px solid #b8b8b8;
+  border-top: 1px solid #ccc;
+  border-radius: 0 0 5px 5px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 8px;
+  z-index: 1;
+  transition: background 0.05s;
+}
+
+.piano .wk:active, .piano .wk.pressed {
+  background: linear-gradient(to bottom, #e8e0d0, #f0e8d8 15%, #f0e8d8 85%, #ddd4c4);
+  border-color: #a08060;
+}
+
+.piano .wk .sa-marker {
+  position: absolute;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.4;
+}
+
+.piano .bk {
+  position: absolute;
+  top: 0;
+  width: 30px;
+  height: 100px;
+  background: linear-gradient(to bottom, #333, #1a1a1a 40%, #111);
+  border: 1px solid #000;
+  border-radius: 0 0 3px 3px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 6px;
+  z-index: 2;
+  transition: background 0.05s;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.4), inset 0 -2px 3px rgba(255,255,255,0.05);
+}
+
+.piano .bk:active, .piano .bk.pressed {
+  background: linear-gradient(to bottom, #5a3e28, #4a3018 40%, #3a2008);
+  height: 98px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+.piano .wk .lbl {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.7rem;
+  color: #888;
+  pointer-events: none;
+}
+
+.piano .wk .hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.45rem;
+  color: #aaa;
+  margin-top: 1px;
+  pointer-events: none;
+}
+
+.piano .bk .lbl {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.6rem;
+  color: #777;
+  pointer-events: none;
+}
+
+.piano .bk .hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.4rem;
+  color: #555;
+  margin-top: 1px;
+  pointer-events: none;
+}
+
+/* ── Controls ── */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  margin-top: 1rem;
+}
+
+.btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.5rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn:hover { border-color: var(--accent); color: var(--text); }
+
+/* ── Coming Soon ── */
+.coming-soon {
+  border-top: 1px solid var(--border-light);
+  padding-top: 3rem;
+  margin-top: 2rem;
+}
+
+.coming-soon h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: 1.4rem;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: 0.1em;
+}
+
+.roadmap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.roadmap-item {
+  padding: 1.25rem;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.roadmap-item .rl {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+
+.roadmap-item .rd {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+footer {
+  text-align: center;
+  padding: 3rem 0 2rem;
+  border-top: 1px solid var(--border-light);
+  margin-top: 3rem;
+}
+
+footer p {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--text-faint);
+}
+
+@media (max-width: 640px) {
+  h1 { font-size: 2.5rem; }
+  .mirror { padding: 1.5rem 1rem; }
+  .swara-node { width: 42px; height: 42px; font-size: 0.8rem; }
+  .raga-name { font-size: 1.8rem; }
+  .roadmap { grid-template-columns: 1fr; }
+  .piano .wk { width: 36px; height: 130px; }
+  .piano .bk { width: 24px; height: 80px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Ekalavya</h1>
+    <p class="tagline">the silent mirror for your riyaz</p>
+    <span class="beta-tag">beta</span>
+  </header>
+
+  <div class="sa-selector">
+    <label for="sa-select">Sa =</label>
+    <select id="sa-select"></select>
+  </div>
+
+  <div class="midi-status" id="midi-status">detecting midi devices…</div>
+
+  <div class="mirror">
+    <div class="swara-grid" id="swara-grid"></div>
+    <div class="raga-result" id="raga-result">
+      <span class="waiting">play a few notes…</span>
+    </div>
+  </div>
+
+  <div class="keyboard-section">
+    <div class="keyboard-label">or use your keyboard</div>
+    <div class="piano-container">
+      <div class="piano" id="piano"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="btn-reset">Reset</button>
+  </div>
+
+  <div class="coming-soon">
+    <h2>What's Coming</h2>
+    <div class="roadmap">
+      <div class="roadmap-item">
+        <div class="rl">Tonal Geography</div>
+        <div class="rd">See where your melody dwells — a heat map of swara residence over time</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="rl">Phrase Shape</div>
+        <div class="rd">Visualize aaroh and avroh — the rise and fall of your melodic phrases</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="rl">Session Memory</div>
+        <div class="rd">Patterns across your practice — notice what your hands know before your mind does</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="rl">Live Instruments</div>
+        <div class="rd">Plug in your sitar, sarangi, or bansuri — Ekalavya listens to the real thing</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>ekalavya.studio</p>
+  </footer>
+</div>
+
+<script>
+const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const SWARA_DISPLAY = ['S','r','R','g','G','M','M\u2020','P','d','D','n','N'];
+
+const RAGA_DB = [
+  { name:'Yaman', thaat:'Kalyan', swaras:new Set([0,2,4,6,7,9,11]),
+    aroh:'N\u0302 R G M\u2020 D N \u1E60', avroh:'\u1E60 N D P M\u2020 G R S' },
+  { name:'Bhairav', thaat:'Bhairav', swaras:new Set([0,1,4,5,7,8,11]),
+    aroh:'S r G M P d N \u1E60', avroh:'\u1E60 N d P M G r S' },
+  { name:'Kafi', thaat:'Kafi', swaras:new Set([0,2,3,5,7,9,10]),
+    aroh:'S R g M P D n \u1E60', avroh:'\u1E60 n D P M g R S' },
+  { name:'Bhimpalasi', thaat:'Kafi', swaras:new Set([0,2,3,5,7,9,10]),
+    aroh:'S g M P n \u1E60', avroh:'\u1E60 n D P M g R S' },
+  { name:'Bageshree', thaat:'Kafi', swaras:new Set([0,2,3,5,7,9,10]),
+    aroh:'S g M D n \u1E60', avroh:'\u1E60 n D M g R S' },
+  { name:'Todi', thaat:'Todi', swaras:new Set([0,1,3,6,7,8,11]),
+    aroh:'S r g M\u2020 d N \u1E60', avroh:'\u1E60 N d P M\u2020 g r S' },
+  { name:'Marwa', thaat:'Marwa', swaras:new Set([0,1,4,6,9,11]),
+    aroh:'S r G M\u2020 D N \u1E60', avroh:'\u1E60 N D M\u2020 G r S' },
+  { name:'Durga', thaat:'Bilawal', swaras:new Set([0,2,5,7,9]),
+    aroh:'S R M P D \u1E60', avroh:'\u1E60 D P M R S' },
+  { name:'Bihag', thaat:'Bilawal', swaras:new Set([0,2,4,5,6,7,9,11]),
+    aroh:'S G M P N \u1E60', avroh:'\u1E60 N D P M\u2020P G M G R S' },
+  { name:'Des', thaat:'Khamaj', swaras:new Set([0,2,4,5,7,9,10,11]),
+    aroh:'S R M P n \u1E60', avroh:'\u1E60 N D P M G R S' },
+  { name:'Bilawal', thaat:'Bilawal', swaras:new Set([0,2,4,5,7,9,11]),
+    aroh:'S R G M P D N \u1E60', avroh:'\u1E60 N D P M G R S' },
+  { name:'Khamaj', thaat:'Khamaj', swaras:new Set([0,2,4,5,7,9,10]),
+    aroh:'S R G M P D n \u1E60', avroh:'\u1E60 n D P M G R S' },
+  { name:'Asavari', thaat:'Asavari', swaras:new Set([0,2,3,5,7,8,10]),
+    aroh:'S R M P d n \u1E60', avroh:'\u1E60 n d P M g R S' },
+  { name:'Puriya Dhanashree', thaat:'Purvi', swaras:new Set([0,1,4,6,7,8,11]),
+    aroh:'S r G M\u2020 d N \u1E60', avroh:'\u1E60 N d P M\u2020 G r S' },
+  { name:'Malkauns', thaat:'Bhairavi', swaras:new Set([0,3,5,8,10]),
+    aroh:'S g M d n \u1E60', avroh:'\u1E60 n d M g S' }
+];
+
+let saNote = 1;
+let playedSwaras = new Map();
+let currentlyPlaying = new Set();
+let midiAccess = null;
+
+// Sa selector
+const saSelect = document.getElementById('sa-select');
+NOTE_NAMES.forEach((n,i) => {
+  const o = document.createElement('option');
+  o.value = i; o.textContent = n;
+  if (i === 1) o.selected = true;
+  saSelect.appendChild(o);
+});
+saSelect.addEventListener('change', e => { saNote = parseInt(e.target.value); resetMirror(); });
+
+// Swara grid
+function buildSwaraGrid() {
+  const g = document.getElementById('swara-grid');
+  g.innerHTML = '';
+  SWARA_DISPLAY.forEach((n,i) => {
+    const d = document.createElement('div');
+    d.className = 'swara-node'; d.dataset.index = i;
+    d.innerHTML = `${n}<span class="count">0</span>`;
+    g.appendChild(d);
+  });
+}
+buildSwaraGrid();
+
+function midiToSwara(m) { return ((m % 12) - saNote + 12) % 12; }
+
+function onNoteOn(m) {
+  const s = midiToSwara(m);
+  playedSwaras.set(s, (playedSwaras.get(s)||0)+1);
+  currentlyPlaying.add(s);
+  updateDisplay(); identifyRaga();
+}
+
+function onNoteOff(m) {
+  currentlyPlaying.delete(midiToSwara(m));
+  updateDisplay();
+}
+
+function updateDisplay() {
+  document.querySelectorAll('.swara-node').forEach(n => {
+    const i = parseInt(n.dataset.index), c = playedSwaras.get(i)||0;
+    n.classList.toggle('active', c > 0);
+    n.classList.toggle('playing', currentlyPlaying.has(i));
+    n.querySelector('.count').textContent = c;
+  });
+}
+
+function identifyRaga() {
+  const played = new Set(playedSwaras.keys());
+  if (played.size < 3) {
+    document.getElementById('raga-result').innerHTML = '<span class="waiting">keep playing\u2026</span>';
+    return;
+  }
+  const scores = RAGA_DB.map(r => {
+    let mc=0, ec=0, ms=0;
+    played.forEach(s => { if(r.swaras.has(s)) mc++; else ec++; });
+    r.swaras.forEach(s => { if(!played.has(s)) ms++; });
+    return { raga:r, score: mc*10 - ec*15 - ms*2, matchCount:mc, extraCount:ec };
+  }).sort((a,b) => b.score - a.score);
+
+  const best = scores[0];
+  const cands = scores.filter(s => s.score > 0 && s.extraCount <= 1).slice(0,4);
+
+  if (best.score <= 0 || best.matchCount < 3) {
+    document.getElementById('raga-result').innerHTML = '<span class="waiting">listening\u2026</span>';
+    return;
+  }
+
+  const r = best.raga;
+  let h = `<div class="raga-name visible">${r.name}</div>
+    <div class="raga-swaras visible">${r.aroh}</div>
+    <div class="raga-thaat visible">${r.thaat} thaat</div>`;
+  if (cands.length > 1) {
+    h += '<div class="raga-candidates">';
+    cands.forEach((c,i) => { h += `<span class="candidate-tag ${i===0?'top':''}">${c.raga.name}</span>`; });
+    h += '</div>';
+  }
+  document.getElementById('raga-result').innerHTML = h;
+}
+
+function resetMirror() {
+  playedSwaras.clear(); currentlyPlaying.clear();
+  updateDisplay();
+  document.getElementById('raga-result').innerHTML = '<span class="waiting">play a few notes\u2026</span>';
+}
+document.getElementById('btn-reset').addEventListener('click', resetMirror);
+
+// MIDI
+const statusEl = document.getElementById('midi-status');
+async function initMIDI() {
+  if (!navigator.requestMIDIAccess) {
+    statusEl.textContent = 'web midi not supported \u2014 use the keyboard below';
+    statusEl.className = 'midi-status error'; return;
+  }
+  try {
+    midiAccess = await navigator.requestMIDIAccess();
+    connectMIDI(); midiAccess.onstatechange = connectMIDI;
+  } catch(e) {
+    statusEl.textContent = 'midi access denied \u2014 use the keyboard below';
+    statusEl.className = 'midi-status error';
+  }
+}
+function connectMIDI() {
+  let ok = false;
+  for (let inp of midiAccess.inputs.values()) {
+    inp.onmidimessage = msg => {
+      const [st,n,v] = msg.data, cmd = st & 0xf0;
+      if (cmd===0x90 && v>0) onNoteOn(n);
+      else if (cmd===0x80 || (cmd===0x90 && v===0)) onNoteOff(n);
+    };
+    ok = true;
+    statusEl.textContent = `connected: ${inp.name}`;
+    statusEl.className = 'midi-status connected';
+  }
+  if (!ok) { statusEl.textContent = 'no midi device \u2014 use the keyboard below'; statusEl.className = 'midi-status'; }
+}
+
+// ── Piano keyboard ──
+// Range: lower Ma (offset -7) to upper Ma† (offset +18)
+// White key pattern per semitone offset mod 12:
+// 0=S(W) 1=r(B) 2=R(W) 3=g(B) 4=G(W) 5=M(W) 6=M†(B) 7=P(W) 8=d(B) 9=D(W) 10=n(B) 11=N(W)
+const WHITE_SET = new Set([0,2,4,5,7,9,11]);
+const WK_W = 48;
+
+function swaraLabel(offset) {
+  const idx = ((offset % 12) + 12) % 12;
+  const base = SWARA_DISPLAY[idx];
+  if (offset < 0) return base + '\u0323'; // dot below for mandra
+  if (offset >= 12) return base + '\u0307'; // dot above for taar
+  return base;
+}
+
+// Key bindings
+// Lower whites (Ma Pa Dha Ni): z x c v
+// Lower blacks (Ma† dha ni): 1 2 3
+// Middle whites (S R G M P D N Sa): a s d f g h j k
+// Middle blacks (r g M† d n): w e t y u
+// Upper whites (Re Ga Ma): i o p
+// Upper blacks (re ga): 9 0
+// Upper Ma†: - (minus)
+const KB = {};
+const lw = [-7,-5,-3,-1], lb = [-6,-4,-2];
+const mw = [0,2,4,5,7,9,11,12], mb = [1,3,6,8,10];
+const uw = [14,16,17], ub = [13,15];
+
+'zxcv'.split('').forEach((k,i) => { if(lw[i]!==undefined) KB[k]=lw[i]; });
+'123'.split('').forEach((k,i) => { if(lb[i]!==undefined) KB[k]=lb[i]; });
+'asdfghjk'.split('').forEach((k,i) => { if(mw[i]!==undefined) KB[k]=mw[i]; });
+'wetyu'.split('').forEach((k,i) => { if(mb[i]!==undefined) KB[k]=mb[i]; });
+'iop'.split('').forEach((k,i) => { if(uw[i]!==undefined) KB[k]=uw[i]; });
+'90'.split('').forEach((k,i) => { if(ub[i]!==undefined) KB[k]=ub[i]; });
+KB['-'] = 18; // upper Ma†
+
+const OFF2KEY = {};
+Object.entries(KB).forEach(([k,o]) => { OFF2KEY[o] = k.toUpperCase(); });
+
+function buildPiano() {
+  const piano = document.getElementById('piano');
+  piano.innerHTML = '';
+
+  // Full range: -7 to +18
+  const allOffsets = [];
+  for (let i = -7; i <= 18; i++) allOffsets.push(i);
+
+  const whites = allOffsets.filter(o => WHITE_SET.has(((o%12)+12)%12));
+  const blacks = allOffsets.filter(o => !WHITE_SET.has(((o%12)+12)%12));
+
+  // Place white keys
+  const whitePos = {};
+  whites.forEach((o, i) => {
+    whitePos[o] = i;
+    const el = document.createElement('div');
+    el.className = 'wk';
+    el.dataset.offset = o;
+    el.style.left = (i * WK_W) + 'px';
+    const hint = OFF2KEY[o] || '';
+    let inner = '';
+    // Mark Sa positions
+    if (((o%12)+12)%12 === 0) inner += '<div class="sa-marker"></div>';
+    inner += `<span class="lbl">${swaraLabel(o)}</span>`;
+    if (hint) inner += `<span class="hint">${hint}</span>`;
+    el.innerHTML = inner;
+    addPianoListeners(el, o);
+    piano.appendChild(el);
+  });
+
+  // Place black keys
+  blacks.forEach(o => {
+    const prevW = o - 1;
+    if (whitePos[prevW] === undefined) return;
+    const left = whitePos[prevW] * WK_W + WK_W - 15;
+    const el = document.createElement('div');
+    el.className = 'bk';
+    el.dataset.offset = o;
+    el.style.left = left + 'px';
+    const hint = OFF2KEY[o] || '';
+    el.innerHTML = `<span class="lbl">${swaraLabel(o)}</span>${hint ? `<span class="hint">${hint}</span>` : ''}`;
+    addPianoListeners(el, o);
+    piano.appendChild(el);
+  });
+
+  piano.style.width = (whites.length * WK_W) + 'px';
+  piano.style.height = '168px';
+  piano.style.marginBottom = '8px';
+}
+
+function addPianoListeners(el, offset) {
+  const midi = () => saNote + 60 + offset;
+  el.addEventListener('mousedown', e => { e.preventDefault(); onNoteOn(midi()); el.classList.add('pressed'); });
+  el.addEventListener('mouseup', () => { onNoteOff(midi()); el.classList.remove('pressed'); });
+  el.addEventListener('mouseleave', () => { onNoteOff(midi()); el.classList.remove('pressed'); });
+  el.addEventListener('touchstart', e => { e.preventDefault(); onNoteOn(midi()); el.classList.add('pressed'); });
+  el.addEventListener('touchend', e => { e.preventDefault(); onNoteOff(midi()); el.classList.remove('pressed'); });
+}
+
+buildPiano();
+
+// Computer keyboard
+const held = new Set();
+document.addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  if (KB.hasOwnProperty(k) && !held.has(k)) {
+    held.add(k);
+    onNoteOn(saNote + 60 + KB[k]);
+    document.querySelectorAll('#piano > div').forEach(el => {
+      if (parseInt(el.dataset.offset) === KB[k]) el.classList.add('pressed');
+    });
+  }
+  if (e.key === 'Escape') resetMirror();
+});
+
+document.addEventListener('keyup', e => {
+  const k = e.key.toLowerCase();
+  if (KB.hasOwnProperty(k)) {
+    held.delete(k);
+    onNoteOff(saNote + 60 + KB[k]);
+    document.querySelectorAll('#piano > div').forEach(el => {
+      if (parseInt(el.dataset.offset) === KB[k]) el.classList.remove('pressed');
+    });
+  }
+});
+
+initMIDI();
+</script>
+</body>
+</html>
