@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>instrument</title>
+<style>
+  :root { --bg: #16171A; --raised: #202226; --line: #2C2E33; --ink: #F2F3F5; --mute: #8E929B; --dim: #55575D; --accent: #C6F432;
+          --c: #F2F3F5; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--ink); font: 500 clamp(12px, 3.6vw, 24px)/1.3 -apple-system, "SF Pro Text", system-ui, sans-serif;
+         box-sizing: border-box; padding: 0 12px 10px; display: grid; grid-template-rows: 5px auto minmax(0, 1fr) auto; gap: 8px; overflow: hidden; }
+  body::before { content: ""; background: var(--c); margin: 0 -12px; }
+  header { display: flex; align-items: center; gap: 10px; }
+  #name { font: 700 1em -apple-system, "SF Pro Display", sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+  #chip { font-size: .7em; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: .15em .6em; border-radius: 4px;
+          background: var(--raised); color: var(--mute); }
+  #chip.play { background: var(--c); color: #0B0C0E; } #chip.line { background: transparent; color: var(--c); box-shadow: inset 0 0 0 2px var(--c); }
+  #chip.wait { color: var(--dim); }
+  #meter { margin-left: auto; width: 25%; height: 8px; border-radius: 3px; background: var(--raised); overflow: hidden; }
+  #meter i { display: block; height: 100%; width: 0; background: var(--c); transition: width .25s ease-out; }
+  #roll { position: relative; background: #0b0b0c; border-radius: 6px; min-height: 0; overflow: hidden; }
+  #roll i { position: absolute; height: 5%; min-height: 3px; border-radius: 2px; background: var(--c); opacity: .3; }
+  #roll i.on { opacity: 1; }
+  #roll b { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); } #roll b.sam { background: var(--dim); }
+  #roll .now { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff8; }
+  footer { display: flex; justify-content: space-between; gap: 8px; color: var(--mute); font-size: .78em; min-height: 1.3em; }
+  #queue span { margin-left: 6px; } #queue .thinking { color: var(--c); animation: pulse 1s steps(1) infinite; }
+  @keyframes pulse { 50% { opacity: .3; } }
+  body.out #roll, body.out #name { opacity: .35; }
+  body.picked { box-shadow: inset 0 0 0 2px var(--accent); }
+</style>
+</head>
+<body>
+<header><span id="name">instrument</span><span id="chip" class="wait">waits</span><span id="meter"><i></i></span></header>
+<div id="roll"><b style="left:25%"></b><b style="left:50%"></b><b style="left:75%"></b><div class="now" id="now"></div></div>
+<footer><span id="state"></span><span id="queue"></span></footer>
+<script>
+// One instrument. It knows only itself and the outer protocol the controller says to everyone (BroadcastChannel
+// "ensemble"): when each cycle begins, the laya, the raga and Sa, how busy, how far phrases wander, whether it is
+// in, its level, a tihai. It composes its own phrases ahead into its own queue; a phrase is played on the first sam
+// after it is ready (the variance is its own, the cycle is the controller's). It plays into the controller's room
+// when it has one (the studio's air), else into its own.
+const NAME = new URLSearchParams(location.search).get("i") || "sitar";
+const SEATS = {tanpura: [.35, .9, "back, right"], tabla: [-.35, .15, "front, left"],
+               sitar: [-.75, .45, "the left mirror"], flute: [.75, .5, "the right mirror"]};
+const [PAN, FAR, WHERE] = SEATS[NAME] || [0, .5, ""];
+const THINK = {tanpura: [0, 0], tabla: [0, 0], sitar: [2, 9], flute: [4, 12]}[NAME] || [0, 0];
+document.getElementById("name").textContent = NAME;
+document.documentElement.style.setProperty("--c", getComputedStyle(document.documentElement).getPropertyValue("--c"));
+document.body.style.setProperty("--c", {sitar: "#FFC53D", flute: "#3DD9E8", tabla: "#FF6B8B", tanpura: "#A897FF"}[NAME] || "#F2F3F5");
+document.title = NAME;
+
+let ctx = null, out = null;
+function air() {                     // the controller's room if this window is inside it, else a room of its own
+  if (out) return true;
+  try { if (parent !== window && parent.ROOM && parent.ROOM.ctx) { ctx = parent.ROOM.ctx; } } catch (_) {}
+  if (!ctx) { try { ctx = new AudioContext(); } catch (_) { return false; } }
+  const pan = ctx.createStereoPanner(); pan.pan.value = PAN;
+  out = ctx.createGain(); out.gain.value = 1 - FAR * .45;
+  out.connect(pan);
+  let dest = ctx.destination;
+  try { if (parent !== window && parent.ROOM) dest = parent.ROOM.input(FAR); } catch (_) {}
+  pan.connect(dest);
+  return true;
+}
+
+// ---- the protocol, as heard
+let P = null, level = 1, inOn = true;
+const ch = new BroadcastChannel("ensemble");
+const queue = [];                    // [{lands, notes:[{b, n, d, v}], made}]  b beat (may be fractional), n semitones from Sa
+let thinking = false, composedFor = -1;
+const boss = () => { try { return parent !== window ? parent.CONTROLLER : null; } catch (_) { return null; } };
+ch.onmessage = (m) => {
+  const e = m.data, mine = boss();
+  if (mine && e.from !== mine) return;     // another ensemble tab: not ours
+  if (e.t === "cycle") cycle(e);
+  if (e.t === "afresh" && e.who === NAME) { queue.length = 0; draw(); compose(); }
+  if (e.t === "pick") document.body.classList.toggle("picked", e.who === NAME);
+};
+
+// ---- composing: by rule, in the raga, ahead of time
+const rnd = (a, b) => a + Math.random() * (b - a);
+const pickOf = (xs) => xs[Math.floor(Math.random() * xs.length)];
+function degree(scale, d) {          // a scale degree (may be negative or past the octave) as semitones from Sa
+  const n = scale.length, o = Math.floor(d / n);
+  return scale[((d % n) + n) % n] + 12 * o;
+}
+const THEKA = ["dha", "dhin", "dhin", "dha", "dha", "dhin", "dhin", "dha", "dha", "tin", "tin", "ta", "ta", "dhin", "dhin", "dha"];
+function make(p, lands) {
+  const S = p.scale, busy = p.busy, wander = p.wander, notes = [];
+  if (NAME === "tanpura") {
+    [[0, -5], [4, 0], [8, 0], [12, -12]].forEach(([b, n]) => notes.push({b, n, d: 4.2, v: .5}));
+  } else if (NAME === "tabla") {
+    const T = p.tabla || {density: 0, fills: 0}, every = [0, 8, 4, 2, 1][T.fills], per = [1, 1, 2, 3, 4][T.density];
+    const fill = every && lands % every === every - 1;          // the fill closes the cycle before a sam
+    const upto = fill ? 12 : 16;
+    for (let k = 0; k < upto * per; k++) {                      // the theka at the layakari: per bols a matra
+      const b = k / per, bol = THEKA[k % 16];
+      notes.push({b, n: bol, d: 1 / per, v: k === 0 ? 1 : (k % per ? .5 : .75)});
+    }
+    if (T.density === 1) for (let b = 0; b < upto; b++) if (b % 4 === 3) ["ti", "ra", "ki", "ta"].forEach((bol, i) => notes.push({b: b + i * .25, n: bol, d: .25, v: .4}));
+    if (fill) {                                                 // a small tihai into the sam: dha tirakita dha, three times
+      const m = ["dha", "ti", "ra", "ki", "ta", "dha"], at = [0, .5, .75, 1, 1.25, 1.5];
+      [12, 13.25, 14.5].forEach(s0 => m.forEach((bol, i) => s0 + at[i] < 16 && notes.push({b: s0 + at[i], n: bol, d: .25, v: bol === "dha" ? .9 : .5})));
+    }
+  } else if (NAME === "sitar") {
+    const per = busy < .3 ? 1 : busy < .6 ? 2 : busy < .85 ? 3 : 4;
+    let d = 0, b = rnd(0, 2) | 0;
+    while (b < 14) {
+      const step = Math.random() < wander ? pickOf([-3, -2, 2, 3, 4]) : pickOf([-1, 1, 1, -1, 0]);
+      d = Math.max(-4, Math.min(10, d + step));
+      notes.push({b, n: degree(S, d), d: 1 / per, v: rnd(.5, .85), meend: Math.random() < wander * .5});
+      b += 1 / per * (Math.random() < .2 ? 2 : 1);
+    }
+    notes.push({b: 15, n: degree(S, 1), d: .5, v: .7}, {b: 15.5, n: 0, d: .5, v: .9});        // a turn home, to Sa at the sam
+  } else if (NAME === "flute") {
+    let d = pickOf([2, 4, 5]), b = rnd(0, 3) | 0;
+    while (b < 14) {
+      const len = pickOf(busy > .5 ? [1, 2, 2] : [2, 3, 4]);
+      notes.push({b, n: degree(S, d), d: len * .95, v: rnd(.35, .6)});
+      d = Math.max(-2, Math.min(9, d + (Math.random() < wander ? pickOf([-3, 3, 4]) : pickOf([-1, 1, -2, 2]))));
+      b += len;
+    }
+  }
+  return notes;
+}
+// ---- following neonix (sitar, flute): what he played last cycle is the sawal; the jawab lands when it is ready
+function snap(n, scale) {
+  const o = Math.floor(n / 12), r = n - 12 * o;
+  let best = scale[0], bd = 99;
+  for (const s of scale.concat(12)) if (Math.abs(s - r) < bd) { bd = Math.abs(s - r); best = s; }
+  return best + 12 * o;
+}
+function jawab(p) {
+  const L = p.lead || [], S = p.scale;
+  if (!L.length) return [];                        // he is silent: they rest
+  if (NAME === "sitar") return L.map(x => ({b: x.b, n: snap(x.n + (Math.random() < p.wander * .5 ? pickOf([-12, 12]) : 0), S),
+                                             d: Math.min(x.d, 2), v: .4 + x.v * .5}));
+  const out = [];                                  // flute: holds his first note in each quarter of the cycle
+  for (let q = 0; q < 4; q++) { const x = L.find(y => y.b >= q * 4 && y.b < q * 4 + 4); if (x) out.push({b: q * 4, n: snap(x.n, S), d: 3.8, v: .45}); }
+  return out;
+}
+function bolOf(n) {                               // the tabla plays a line by register: low on the bayan, high on the dayan
+  const r = ((n % 12) + 12) % 12;
+  return n < 0 ? "ge" : r < 3 ? "dha" : r < 6 ? "dhin" : r < 9 ? "ta" : "tin";
+}
+function tihaiNotes(p) {             // one motif three times, the last note on beat 15, Sa on the next sam
+  const S = p.scale, m = NAME === "tabla" ? ["dha", "ti", "dha"] : [degree(S, 2), degree(S, 1), 0];
+  const notes = [];
+  [5, 9, 13].forEach((start) => m.forEach((n, k) => notes.push({b: start + k * .66, n, d: .6, v: .8})));
+  return notes;
+}
+function compose() {                 // ahead of time; slow thinkers land a cycle or more later
+  if (P && P.started === false && NAME !== "tanpura") return;           // nothing composed until he plays
+  if (thinking || !P || queue.length >= (Array.isArray(P.lead) ? 1 : 2)) return;
+  thinking = true; draw();
+  const p = P, wait = rnd(...THINK) * 1000;
+  setTimeout(() => {
+    thinking = false;
+    const ready = P ? P.cycle : 0, last = queue.length ? queue[queue.length - 1].lands : ready;
+    const q = P || p, follow = (NAME === "sitar" || NAME === "flute") && Array.isArray(q.lead);
+    queue.push({lands: Math.max(ready + 1, last + 1), notes: follow ? jawab(q) : make(q, Math.max(ready + 1, last + 1)), made: ready, follow});
+    draw(); compose();
+  }, wait);
+}
+
+// ---- playing: what lands on this cycle
+let shown = [];
+let prevP = null;
+function cycle(e) {
+  prevP = P; P = e;
+  const me = (e.inst || {})[NAME] || {};
+  inOn = me.in !== false; level = me.level == null ? 1 : me.level;
+  document.body.classList.toggle("out", !inOn);
+  while (queue.length && queue[0].lands < e.cycle) queue.shift();            // a phrase whose sam has passed is not played late
+  let ph = queue.length && queue[0].lands === e.cycle ? queue.shift() : null;
+  let note = "";
+  let chip = ["plays", "play"];
+  if (Array.isArray(e.lead) && (NAME === "sitar" || NAME === "flute")) chip = ["follows you", "play"];
+  if (me.line && typeof me.line.from === "number" && e.cycle >= me.line.from) {     // neonix's line: what he played, in this voice
+    const k = (e.cycle - me.line.from) % me.line.len;
+    ph = {lands: e.cycle, notes: me.line.notes.filter(x => Math.floor(x.b / 16) === k)
+            .map(x => ({b: x.b - 16 * k, n: NAME === "tabla" ? bolOf(x.n) : x.n, d: x.d, v: .35 + x.v * .6}))};
+    chip = ["your line", "line"]; note = me.line.len > 1 ? `cycle ${k + 1} of ${me.line.len}` : "";
+  }
+  if (!ph && !(me.line) && THINK[1] === 0 && inOn && (e.started !== false || NAME === "tanpura"))
+    ph = {lands: e.cycle, notes: make(e, e.cycle)};                         // a part that needs no thinking joins on this very sam
+  if (e.tihai && NAME !== "tanpura") ph = {lands: e.cycle, notes: tihaiNotes(e)};
+  if (ph && !ph.notes.length) ph = null;
+  if (!ph) chip = ["rests", ""];
+  if (!inOn) chip = ["rest", ""];
+  if (e.started === false && NAME !== "tanpura") chip = ["waits for you", "wait"];
+  const c = document.getElementById("chip"); c.textContent = chip[0]; c.className = chip[1];
+  if (NAME === "tabla" && e.tabla && !note) note = ["thah", "filled", "dugun", "tigun", "chaugun"][e.tabla.density] || "";
+  document.getElementById("state").textContent = note;
+  shown = ph ? ph.notes : [];
+  roll(e);
+  if (ph && inOn && air()) play(ph.notes, e);
+  compose(); draw();
+}
+const freq = (n, sa) => 440 * Math.pow(2, (sa + n - 69) / 12);
+function play(notes, e) {
+  if (ctx.state !== "running") return;              // silent until the room is woken (a browser rule)
+  const T0 = e.at, beat = e.beatS;
+  for (const x of notes) {
+    const t = T0 + x.b * beat;
+    if (t < ctx.currentTime - .02) continue;
+    voice(x, t, x.d * beat, e);
+  }
+}
+function env(g, t, a, peak, dur, rel) {
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a);
+  g.gain.setTargetAtTime(0.0001, t + dur, rel);
+}
+function voice(x, t, dur, e) {
+  const L = level * x.v, sa = e.sa;
+  if (NAME === "tabla") return drum(x.n, t, L, sa);
+  const g = ctx.createGain(); g.connect(out);
+  const f = freq(x.n, NAME === "tanpura" ? sa - 12 : sa);
+  if (NAME === "tanpura") {
+    for (const det of [-4, 0, 5]) {
+      const o = ctx.createOscillator(), lp = ctx.createBiquadFilter();
+      o.type = "sawtooth"; o.frequency.value = f; o.detune.value = det; lp.type = "lowpass"; lp.frequency.value = f * 6; lp.Q.value = 3;
+      o.connect(lp).connect(g); o.start(t); o.stop(t + dur + 3);
+    }
+    env(g, t, .25, .05 * L, dur, .9);
+  } else if (NAME === "sitar") {
+    const o = ctx.createOscillator(), o2 = ctx.createOscillator(), lp = ctx.createBiquadFilter();
+    o.type = "sawtooth"; o2.type = "square"; o.frequency.setValueAtTime(x.meend ? f * .944 : f, t);
+    if (x.meend) o.frequency.exponentialRampToValueAtTime(f, t + dur * .6);
+    o2.frequency.value = f * 2.01;
+    lp.type = "lowpass"; lp.frequency.setValueAtTime(f * 12, t); lp.frequency.exponentialRampToValueAtTime(f * 2, t + .5); lp.Q.value = 6;
+    const g2 = ctx.createGain(); g2.gain.value = .25; o2.connect(g2).connect(lp);
+    o.connect(lp).connect(g); o.start(t); o2.start(t); o.stop(t + dur + 2); o2.stop(t + dur + 2);
+    env(g, t, .004, .12 * L, .05, Math.max(.25, dur));
+  } else if (NAME === "flute") {
+    const o = ctx.createOscillator(), vib = ctx.createOscillator(), vg = ctx.createGain();
+    o.type = "sine"; o.frequency.value = f * 2; vib.frequency.value = 5.2; vg.gain.value = f * .012;
+    vib.connect(vg).connect(o.frequency); o.connect(g);
+    const n = ctx.createBufferSource(), nb = ctx.createBuffer(1, ctx.sampleRate * .3, ctx.sampleRate), nd = nb.getChannelData(0);
+    for (let i = 0; i < nd.length; i++) nd[i] = (Math.random() * 2 - 1) * .3;
+    const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = f * 2; bp.Q.value = 2; n.buffer = nb; n.connect(bp).connect(g);
+    o.start(t); vib.start(t); n.start(t); o.stop(t + dur + 1); vib.stop(t + dur + 1);
+    env(g, t, .12, .09 * L, dur, .2);
+  }
+}
+function drum(bol, t, L, sa) {
+  const T = (P && P.tabla) || {bayan: 85, ghissa: 0};
+  const hit = (f, f2, decay, peak, type = "sine") => {
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = type;
+    o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + decay * .8);
+    o.connect(g).connect(out); g.gain.setValueAtTime(peak * L, t); g.gain.exponentialRampToValueAtTime(.0001, t + decay); o.start(t); o.stop(t + decay + .05);
+  };
+  const click = (peak, hp = 2500, len = .03) => {
+    const n = ctx.createBufferSource(), b = ctx.createBuffer(1, ctx.sampleRate * len, ctx.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+    const f = ctx.createBiquadFilter(), g = ctx.createGain(); f.type = "highpass"; f.frequency.value = hp; g.gain.value = peak * L;
+    n.buffer = b; n.connect(f).connect(g).connect(out); n.start(t);
+  };
+  const dayan = freq(0, sa), bay = T.bayan, slide = bay * Math.pow(2, (T.ghissa || 0) / 12);
+  const bayan = (decay, peak) => hit(bay * 1.25, T.ghissa ? slide * 1.25 : bay, decay, peak);   // open dagga; ghissa slides it up
+  const B = {dha: "na+ge", dhin: "tin+ge", dhi: "tin+ge", ge: "ge", ghe: "ge", ka: "ka", ke: "ka", kat: "ka",
+             na: "na", ta: "na", tin: "tin", tu: "tu", ti: "ti", ra: "ti", ki: "ti", te: "ti"}[bol] || "na";
+  for (const part of B.split("+")) {
+    if (part === "ge") bayan(.55, .55);
+    if (part === "ka") { hit(bay * 1.6, null, .06, .35); click(.08, 800, .02); }               // closed bayan: a flat slap
+    if (part === "na") { hit(dayan, null, .14, .26, "triangle"); hit(dayan * 2.76, null, .08, .06); click(.14); }   // the rim, ringing
+    if (part === "tin") { hit(dayan, null, .55, .22); hit(dayan * 2.01, null, .3, .08); }      // the open syahi
+    if (part === "tu") { hit(dayan, null, .7, .26); }
+    if (part === "ti") { hit(dayan * 1.5, null, .05, .16, "triangle"); click(.08, 3500, .015); }  // closed, light
+  }
+}
+
+// ---- drawing: its own roll and queue
+function roll(e) {
+  const r = document.getElementById("roll");
+  r.querySelectorAll("i").forEach(n => n.remove());
+  const ns = shown.filter(x => typeof x.n === "number"), lo = Math.min(-12, ...ns.map(x => x.n)), hi = Math.max(12, ...ns.map(x => x.n));
+  shown.forEach((x, k) => {
+    const i = document.createElement("i"), y = typeof x.n === "number" ? 1 - (x.n - lo) / (hi - lo || 1) : (x.n.startsWith("dh") || x.n === "ge" ? .8 : .3);
+    Object.assign(i.style, {left: x.b / 16 * 100 + "%", width: Math.max(.6, x.d / 16 * 100) + "%", top: y * 90 + "%"});
+    i.dataset.b = x.b; i.dataset.d = x.d; r.append(i);
+  });
+}
+function tick() {
+  const now = performance.timeOrigin + performance.now(), cur = P && now < P.wall ? prevP : P;
+  if (cur) {
+    const b = Math.max(0, Math.min(16, (now - cur.wall) / (cur.beatS * 1000)));
+    document.getElementById("now").style.left = b / 16 * 100 + "%";
+    let any = false;
+    document.querySelectorAll("#roll i").forEach(i => { const on = b >= +i.dataset.b && b < +i.dataset.b + Math.max(.25, +i.dataset.d); i.classList.toggle("on", on); any = any || on; });
+    document.querySelector("#meter i").style.width = (any && inOn ? Math.min(100, 55 * level) : 0) + "%";
+  }
+  requestAnimationFrame(tick);
+}
+tick();
+function draw() {
+  const q = document.getElementById("queue");
+  q.innerHTML = (thinking ? `<span class="thinking">composing</span>` : "") + (queue.length ? `<span>${queue.length} ready</span>` : "");
+}
+draw();
+</script>
+</body>
+</html>
