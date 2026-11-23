@@ -22,6 +22,7 @@ const TAALS = {
   rupak:    {name: "Rupak", vibhag: [3, 2, 2], marks: ["0", "1", "2"], theka: "tin tin na | dhi na | dhi na"},
   keherwa:  {name: "Keherwa", vibhag: [4, 4], marks: ["X", "0"], theka: "dha ge na ti | na ka dhi na"},
   dadra:    {name: "Dadra", vibhag: [3, 3], marks: ["X", "0"], theka: "dha dhi na | dha ti na"},
+  dadra12:  {name: "Dadra 12", vibhag: [3, 3, 3, 3], marks: ["X", "0", "2", "0"], theka: "dha dhi na | dha ti na | dha dhi na | dha ti na"},   // a 12/8 bar: Dadra twice
   bhajani:  {name: "Bhajani", vibhag: [4, 4], marks: ["X", "0"], theka: "dhi-. .-na .-dhin dhin-na | tin-. .-na .-tin tin-na"},   // neonix's description, read onto 16 places; he places it exactly in the grid
   laggi:    {name: "Laggi", vibhag: [4, 4], marks: ["X", "0"], theka: "dha-ge na-ti na-ka dhi-na | ta-ke na-ti na-ka dhi-na"},
 };
