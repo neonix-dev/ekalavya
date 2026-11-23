@@ -59,8 +59,8 @@ Western songs (genre `western · …`) carry **chords** instead of a raga: `chor
 bar share it), `meter` (`4/4`, `3/4`, `6/8`, `12/8`; 6/8 and 12/8 count eighths, so the bpm is eighths a minute), `comp`
 (the pattern), `sounds` and `scale`. The left seat loops the chords, the right seat the bass, in the song's key (a
 changed Sa moves them); the loop is as long as the progression. **The tune is never written**: he sings it or plays it.
-The beat is the drum kit (`.puck[data-groove="kit"]`, in the song's metre) with the tabla resting (its theka ready to
-tick), or the tabla's theka; the tanpura is off.
+The beat is the drum kit (`.puck[data-groove="kit"]`, in the song's metre) with the tabla resting (its program `1xp`, a cycle of rest; clear it and the theka
+plays), or the tabla's theka; the tanpura is off.
 
 A song loads in a **mode** (what he does): `listen` (the centre carries the melody too, both grooves on), `piano` /
 `sitar` / `bansuri` / `guitar` / `harmonium` (that sound comes to the centre, silent for his hand), or `manjira` / `shaker`

@@ -210,7 +210,7 @@
   .btn.go { background: var(--accent); border-color: var(--accent); color: var(--bg); height: 30px; padding: 0 14px; }
   .pop.settings { width: 300px; padding: 8px; display: flex; flex-direction: column; gap: 2px; }
   .st-row { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 8px; min-height: 34px; padding: 0 6px; }
-  .songs .chords { font: 500 12px var(--mono); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 330px; }
+  .songs .chords { font: 500 12px var(--mono); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 520px; } .songs [hidden] { display: none !important; }
   .st-credit { font-size: 10.5px; line-height: 1.45; color: var(--text-3); padding: 2px 6px 4px; margin: 0; } .st-credit a { color: var(--text-2); }
   .st-row .lab { font: 500 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
   .st-row .sel { width: 100%; } .st-midi { display: flex; align-items: center; gap: 8px; } .st-midi .sel { width: 74px; flex: none; } .st-midi .status { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -650,13 +650,12 @@ function chordBackdrop(d, c0) {
     s.setLoop({seat: s.name, from: c0, to: c0 + L.cycles - 1, anchor: c0}); s.el.dataset.muted = "0";
   });
 }
-// the beat: the drum kit in the song's metre (the tabla rests, its theka ready to tick), or the tabla's theka
+// the beat: the drum kit in the song's metre (the tabla rests: its program is 1xp, a cycle of rest, round and round;
+// clear the program and the theka plays), or the tabla's theka
 function applyBeat(d) {
   kit.meter = d.meter || "4/4";
   if (d.beat === "kit" && d.meter) {
-    const t = TB.TAALS[d.taal], rest = Array(TB.beatsOf(t)).fill(".").join(" ");
-    tabla.write([{name: "rest (the kit plays)", line: rest}, {name: "theka", line: t.theka}]); [...tablaBox.children].forEach((li, k) => { if (k === 1) li.dataset.off = "1"; });
-    tabla.setProgram(""); door.pad("kit", {x: d.kitBusy, on: true});
+    tabla.setProgram("1xp"); $("#program").value = "1xp"; door.pad("kit", {x: d.kitBusy, on: true});
   } else door.pad("kit", {on: false});
 }
 function applySong(d, play, mode) {
@@ -704,7 +703,7 @@ function drawEd() {
   $("#sd-laya").innerHTML = segHtml(LAYA.map(([n, b, i]) => [b, cap(n), i]), d.bpm);
   $("#sd-taal").innerHTML = segHtml(MY_TAALS.filter(k => TB.TAALS[k]).map(k => [k, TB.TAALS[k].name, TB.beatsOf(TB.TAALS[k])]), d.taal);
   $("#sd-split").textContent = "taal · " + t.vibhag.join("+");
-  $("#sd-raga").hidden = !!d.chords; $("#sd-chords").hidden = !d.chords; $("#sd-chords").textContent = d.chords ? `${d.scale} · ${d.chords.replace(/\s*\|\s*/g, " │ ")}` : "";
+  $("#sd-raga").hidden = !!d.chords; $("#sd-notes").hidden = !!d.chords; $("#sd-chords").hidden = !d.chords; $("#sd-chords").textContent = d.chords ? `${d.scale} · ${d.chords.replace(/\s*\|\s*/g, " │ ")}` : "";
   $("#sd-raga").innerHTML = Object.keys(RAGAS).sort().map(r => `<option${r === d.raga ? " selected" : ""}>${esc(r)}</option>`).join("");
   const used = new Set(d.chords ? d.chords.split(/[\s|]+/).filter(Boolean).flatMap(c => { const ch = AVARTAN_BACKDROP.chord(c); return ch ? ch.tones.map(x => N.SW[((ch.root + x - d.keySa) % 12 + 12) % 12]) : []; })
     : [rg.aroha, rg.avaroha].join(" ").match(/[SrRgGmMPdDnN]/g) || []);

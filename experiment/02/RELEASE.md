@@ -14,7 +14,7 @@ under it. His answers to the questions asked first:
 3. **Recorded keys** (approximate).
 4. **New sounds**: bass, strings, celesta, cello (the same MusyngKite soundfont, already credited).
 
-Source: the `avartan` branch at `2911fdc`, copied as a frozen snapshot.
+Source: the `avartan` branch at `954a205`, copied as a frozen snapshot.
 
 ## The five songs
 
@@ -39,7 +39,7 @@ the new Dadra 12 (one bar of eighths). The tabla option plays that taal's theka.
 - **Chord songs:** `songs.json` entries with `chords`, `meter`, `comp`, `sounds`, `scale`. The left seat loops the
   chords, the right seat the bass; moving Sa in the editor moves them. The centre stays silent for the performer.
 - **Drum kit:** a third puck **K** on the pad (synthesised kick, snare, hats), light / steady / full by the puck's x,
-  loudness by y, in the song's metre. With the kit on, the tabla rests and its theka waits, unticked.
+  loudness by y, in the song's metre. With the kit on, the tabla rests (its program is `1xp`, a cycle of rest; clear it and the theka plays).
 - **Song editor:** Scale shows the chords for these songs; Groove is Drum kit / Tabla; Drone can be Off (these songs
   load with the tanpura off).
 - **Fix:** the kit's clock follows a reset (a song sets the clock back).
