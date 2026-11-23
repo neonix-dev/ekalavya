@@ -770,7 +770,7 @@ function applySong(d, play, mode) {
   backdrop(d.raga, d.backdrop, ["listen", "manjira", "shaker"].includes(mode), d);
   applyBeat(d); if (d.drone === "off" && TP.on) TP.toggle();   // chord songs sound cleaner without the drone
   const g = GENRES[genreOf(d.genre || "")] || {};
-  ["manjira", "shaker"].forEach(k => door.pad(k, {...(g[k] || {x: .3, y: .4}), on: mode === k ? false : mode === "listen" ? true : !!d[k]}));
+  ["manjira", "shaker"].forEach(k => door.pad(k, {...(g[k] || {x: .3, y: .4}), on: mode === k ? false : !!d[k]}));
   keepOff(); CUR = d.title; drawChip(); drawOled(); save(); if (R.ctx) setTimeout(warmAll, 0);
   if (play) moves.play();
 }
