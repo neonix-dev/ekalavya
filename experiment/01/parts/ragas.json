@@ -1,0 +1,27 @@
+{
+  "_about": "The ragas the songs in songs.json are in, for the backdrop a song loads (a quiet background in the song's scale on the side seats; the centre stays silent for his hand). Swars as in notation.js: S r R g G m M P d D n N (lower case komal, M tivra), ' an octave up, , down. aroha / avaroha / pakad are the common textbook forms (one of several in use); vadi / samvadi as usually taught. 'first' is the tanpura's first string. Marked 'approx' where a raga is a mix or its forms differ a lot.",
+  "genres": {
+    "classical": {"manjira": {"on": false, "x": 0.1, "y": 0.4}, "shaker": {"on": false, "x": 0.1, "y": 0.3}},
+    "bhajan": {"manjira": {"on": true, "x": 0.45, "y": 0.5}, "shaker": {"on": false, "x": 0.2, "y": 0.3}},
+    "ghazal": {"manjira": {"on": false, "x": 0.2, "y": 0.4}, "shaker": {"on": true, "x": 0.3, "y": 0.35}},
+    "film": {"manjira": {"on": true, "x": 0.25, "y": 0.35}, "shaker": {"on": true, "x": 0.45, "y": 0.4}}
+  },
+  "ragas": {
+    "Malkauns":         {"aroha": "n, S g m d n S'", "avaroha": "S' n d m g S", "pakad": "m g m d n d m g S", "vadi": "m", "samvadi": "S", "first": "Ma"},
+    "Basant Bahar":     {"aroha": "S G M d N S'", "avaroha": "S' n P m g m R S", "pakad": "m P g m n D N S'", "vadi": "S", "samvadi": "P", "first": "Pa", "approx": true},
+    "Puriya Dhanashri": {"aroha": "N, r G M P d N r'", "avaroha": "r' N d P M G r S", "pakad": "N, r G M P d P M G M r G r S", "vadi": "P", "samvadi": "r", "first": "Pa"},
+    "Yaman":            {"aroha": "N, R G M D N S'", "avaroha": "S' N D P M G R S", "pakad": "N, R G R S P M G R S", "vadi": "G", "samvadi": "N", "first": "Pa"},
+    "Bhimpalasi":       {"aroha": "n, S g m P n S'", "avaroha": "S' n D P m g R S", "pakad": "n, S m g P m g R S", "vadi": "m", "samvadi": "S", "first": "Pa"},
+    "Darbari Kanada":   {"aroha": "n, S R g R S m P d n S'", "avaroha": "S' d n P m P g m R S", "pakad": "g R R S n, S R S", "vadi": "R", "samvadi": "P", "first": "Pa"},
+    "Desh":             {"aroha": "S R m P N S'", "avaroha": "S' n D P D m G R G S", "pakad": "R m P N S' n D P D m G R", "vadi": "R", "samvadi": "P", "first": "Pa"},
+    "Khamaj":           {"aroha": "S G m P D N S'", "avaroha": "S' n D P m G R S", "pakad": "n D m P D m G", "vadi": "G", "samvadi": "N", "first": "Pa"},
+    "Pahadi":           {"aroha": "S R G P D S'", "avaroha": "S' N D P G R S", "pakad": "G R S D, P, D, S", "vadi": "S", "samvadi": "P", "first": "Pa", "approx": true},
+    "Gara":             {"aroha": "S G m P D N S'", "avaroha": "S' n D P m G R S", "pakad": "N, S G m G R G S", "vadi": "G", "samvadi": "N", "first": "Pa", "approx": true},
+    "Hamsadhwani":      {"aroha": "S R G P N S'", "avaroha": "S' N P G R S", "pakad": "N, R G P R S", "vadi": "R", "samvadi": "P", "first": "Pa"},
+    "Hem Kalyan":       {"aroha": "S R G P D S'", "avaroha": "S' N D P M G R S", "pakad": "G P D P M G R S", "vadi": "G", "samvadi": "D", "first": "Pa", "approx": true},
+    "Megh":             {"aroha": "S R m P n S'", "avaroha": "S' n P m R S", "pakad": "R m R P m R n, S", "vadi": "S", "samvadi": "P", "first": "Pa"},
+    "Bhupeshwari":      {"aroha": "S R g P d S'", "avaroha": "S' d P g R S", "pakad": "g R S d, S R g", "vadi": "P", "samvadi": "S", "first": "Pa", "approx": true},
+    "Pilu":             {"aroha": "N, S g m P N S'", "avaroha": "S' n D P m g R S", "pakad": "N, S g R S N, D, P, N, S", "vadi": "g", "samvadi": "N", "first": "Pa"},
+    "Bhairavi":         {"aroha": "S r g m P d n S'", "avaroha": "S' n d P m g r S", "pakad": "m g r g S r n, S", "vadi": "m", "samvadi": "S", "first": "Pa"}
+  }
+}
