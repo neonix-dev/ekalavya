@@ -2,7 +2,7 @@
 // It tells whoever listens (on) about every note, with its beat on the clock. It keeps nothing.
 (function () {
 const R = window.AVARTAN_ROOM, K = window.AVARTAN_CLOCK;
-const SOUND = {piano: "acoustic_grand_piano", sitar: "sitar", santoor: "dulcimer", bansuri: "flute", harmonium: "reed_organ", shehnai: "shanai", guitar: "acoustic_guitar_nylon"};
+const SOUND = {piano: "acoustic_grand_piano", sitar: "sitar", santoor: "dulcimer", bansuri: "flute", harmonium: "reed_organ", shehnai: "shanai", guitar: "acoustic_guitar_nylon", bass: "acoustic_bass", strings: "string_ensemble_1", celesta: "celesta", cello: "cello"};
 const E = window.AVARTAN_EAR = {sound: "piano", level: .9, sa: 61, cents: 0, held: new Map(), heard: [], bus: null, inputs: [],
   SOUND,
   on(fn) { this.heard.push(fn); },

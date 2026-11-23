@@ -45,7 +45,7 @@ A note is one `li` in its seat's `ol[data-score]`:
 - **Loops:** a seat leaving the centre loops the newest phrase played on it (`data-loop-*`), wherever it is, with no break. Brought back to the centre it keeps looping until something is played there; his hand (or your notes) take it over from that beat. After his hand, the loop comes back a vibhag (4 beats) after he lets go.
 - **Give a seat a loop:** set `data-loop-from` and `data-loop-to` (`data-loop-seat` to loop another seat's phrase; `data-loop-anchor` is the cycle the loop starts from). Remove them to stop it.
 - **Mute:** `data-muted="1"` on a seat.
-- **Pad:** `.puck[data-groove="manjira"]` and `[data-groove="shaker"]`: `data-x` 0 simple to 1 complex (the pattern changes on the next sam), `data-y` 0 quiet to 1 loud, `data-on` `1` or `0`.
+- **Pad:** `.puck[data-groove="manjira"]`, `[data-groove="shaker"]` and `[data-groove="kit"]` (the drum kit): `data-x` 0 simple to 1 complex (the pattern changes on the next sam), `data-y` 0 quiet to 1 loud, `data-on` `1` or `0`.
 - **Pins:** `ol[data-box="avartan.pins"] > li[data-name][data-seat][data-from][data-to]`.
 
 ## Songs
@@ -54,6 +54,13 @@ Picking a song (parts/songs.json) tunes the room: Sa (the song's `sa`, C♯ unle
 its raga (parts/ragas.json: Ma for Malkauns), taal, theka and laya. It lays a backdrop: two quiet cycles in the raga,
 `data-by="song"`, on the left seat (the pakad, then the avaroha to Sa) and the right seat (Sa, the vadi, the samvadi, Sa held),
 looping; the pad is set for the genre. The centre seat gets nothing and stops looping: it is his.
+
+Western songs (genre `western · …`) carry **chords** instead of a raga: `chords` (bars split by `|`, two chords in a
+bar share it), `meter` (`4/4`, `3/4`, `6/8`, `12/8`; 6/8 and 12/8 count eighths, so the bpm is eighths a minute), `comp`
+(the pattern), `sounds` and `scale`. The left seat loops the chords, the right seat the bass, in the song's key (a
+changed Sa moves them); the loop is as long as the progression. **The tune is never written**: he sings it or plays it.
+The beat is the drum kit (`.puck[data-groove="kit"]`, in the song's metre) with the tabla resting (its program `1xp`, a cycle of rest; clear it and the theka
+plays), or the tabla's theka; the tanpura is off.
 
 A song loads in a **mode** (what he does): `listen` (the centre carries the melody too, both grooves on), `piano` /
 `sitar` / `bansuri` / `guitar` / `harmonium` (that sound comes to the centre, silent for his hand), or `manjira` / `shaker`

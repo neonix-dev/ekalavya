@@ -12,6 +12,7 @@ const R = window.AVARTAN_ROOM = {ctx: null, master: null, verb: null, volume: .8
     R.verb = c.createConvolver(); const len = c.sampleRate * 1.8, b = c.createBuffer(2, len, c.sampleRate);
     for (let k = 0; k < 2; k++) { const d = b.getChannelData(k); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.2); }
     R.verb.buffer = b; const wet = c.createGain(); wet.gain.value = .12; R.verb.connect(wet).connect(R.master);
+    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (_) {}   // iPhone: sound even with the ring / silent switch on silent
     c.resume(); return c;
   },
   running() { return !!R.ctx && R.ctx.state === "running"; },

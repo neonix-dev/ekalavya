@@ -1,5 +1,5 @@
 {
- "_about": "laya_bpm = matras per minute, a typical practice tempo picked by ear from well-known renditions (not from a source). Taal is sourced per song. sa = the song's Sa as a MIDI note (61 = C♯, the room's default): the recordings' keys are not sourced, so every song starts on C♯; set it by ear on the tanpura and it can be written here. raga names a raga in ragas.json, which gives the backdrop.",
+ "_about": "laya_bpm = matras per minute, a typical practice tempo picked by ear from well-known renditions (not from a source). Taal is sourced per song. sa = the song's Sa as a MIDI note (61 = C♯, the room's default): the recordings' keys are not sourced, so every song starts on C♯; set it by ear on the tanpura and it can be written here. raga names a raga in ragas.json, which gives the backdrop. Western songs (genre 'western ·') carry chords, a metre and a comp pattern instead of a raga: the room loops the chords and a bass in the song's recorded key (approximate), with a drum kit or tabla; never the tune. 6/8 and 12/8 count eighths, so their bpm is eighths a minute.",
  "thekas": {
   "teentaal": {
    "name": "Teentaal",
@@ -300,6 +300,122 @@
     "https://chandrakantha.com/music-and-dance/film-and-pop/film-songs-tal/film-kaherava-c/"
    ],
    "sa": 61
+  },
+  {
+   "title": "Stand By Me",
+   "artist": "Ben E. King (1961)",
+   "genre": "western · soul",
+   "taal": "keherwa",
+   "meter": "4/4",
+   "laya_bpm": "118",
+   "sa": 69,
+   "scale": "A major",
+   "chords": "A | A | F#m | F#m | D | E | A | A",
+   "comp": "block2",
+   "sounds": {
+    "comp": "guitar",
+    "bass": "bass"
+   },
+   "beat": "kit",
+   "kit_busy": 0.5,
+   "drone": "off",
+   "shaker": true,
+   "approx": true,
+   "sources": [
+    "key, tempo and chords approximate, from the well-known recording; the tune is never written here (the performer brings it)"
+   ]
+  },
+  {
+   "title": "Let It Be",
+   "artist": "The Beatles (1970)",
+   "genre": "western · pop",
+   "taal": "keherwa",
+   "meter": "4/4",
+   "laya_bpm": "72",
+   "sa": 60,
+   "scale": "C major",
+   "chords": "C G | Am F | C G | F C",
+   "comp": "pulse",
+   "sounds": {
+    "comp": "piano",
+    "bass": "bass"
+   },
+   "beat": "kit",
+   "kit_busy": 0,
+   "drone": "off",
+   "approx": true,
+   "sources": [
+    "key, tempo and chords approximate, from the well-known recording; the tune is never written here (the performer brings it)"
+   ]
+  },
+  {
+   "title": "Hedwig's Theme",
+   "artist": "John Williams (Harry Potter, 2001)",
+   "genre": "western · film score",
+   "taal": "dadra",
+   "meter": "3/4",
+   "laya_bpm": "160",
+   "sa": 64,
+   "scale": "E minor",
+   "chords": "Em | Em | G | Em | Am | Em | B7 | Em",
+   "comp": "waltz",
+   "sounds": {
+    "comp": "celesta",
+    "bass": "strings"
+   },
+   "beat": "kit",
+   "kit_busy": 0,
+   "drone": "off",
+   "approx": true,
+   "sources": [
+    "key, tempo and chords approximate, from the well-known recording; the tune is never written here (the performer brings it)"
+   ]
+  },
+  {
+   "title": "Game of Thrones (main title)",
+   "artist": "Ramin Djawadi (2011)",
+   "genre": "western · TV score",
+   "taal": "dadra",
+   "meter": "6/8",
+   "laya_bpm": "255",
+   "sa": 60,
+   "scale": "C minor",
+   "chords": "Cm | Cm | C | C",
+   "comp": "arp6",
+   "sounds": {
+    "comp": "cello",
+    "bass": "strings"
+   },
+   "beat": "kit",
+   "kit_busy": 0.5,
+   "drone": "off",
+   "approx": true,
+   "sources": [
+    "key, tempo and chords approximate, from the well-known recording; the tune is never written here (the performer brings it)"
+   ]
+  },
+  {
+   "title": "Perfect",
+   "artist": "Ed Sheeran (2017)",
+   "genre": "western · pop",
+   "taal": "dadra12",
+   "meter": "12/8",
+   "laya_bpm": "189",
+   "sa": 68,
+   "scale": "A♭ major",
+   "chords": "Ab | Fm | Db | Eb",
+   "comp": "pick12",
+   "sounds": {
+    "comp": "guitar",
+    "bass": "bass"
+   },
+   "beat": "kit",
+   "kit_busy": 0,
+   "drone": "off",
+   "approx": true,
+   "sources": [
+    "key, tempo and chords approximate, from the well-known recording; the tune is never written here (the performer brings it)"
+   ]
   }
  ],
  "out_of_scope": [
@@ -336,7 +452,7 @@
   }
  ],
  "first": {
-  "title": "Eri Aali Piya Bina",
+  "title": "Stand By Me",
   "mode": "listen"
  }
 }
