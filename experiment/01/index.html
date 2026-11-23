@@ -262,7 +262,8 @@
   html.phone .pos { width: auto; min-width: 0; flex: 1; overflow: hidden; } html.phone #pos { font-size: 15px; white-space: nowrap; } html.phone #pos2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
   html.phone footer .play { width: 46px; height: 46px; } html.phone footer .stop { width: 40px; height: 40px; }
   html.phone .menu-btn { height: 40px; } html.phone footer .banner { display: none; }
-  html.phone #sound:not([hidden]) { display: block; position: fixed; left: 50%; top: 42%; transform: translate(-50%, -50%); z-index: 30; padding: 12px 18px; font-size: 15px; border-radius: 12px; pointer-events: none; box-shadow: 0 8px 30px rgba(0,0,0,.18); }
+  html.phone #sound:not([hidden]) { display: block; position: fixed; left: 50%; top: 30%; transform: translate(-50%, -50%); z-index: 30; padding: 12px 18px; font-size: 15px; border-radius: 12px; pointer-events: none;
+    background: var(--surface); color: var(--accent); border: 1px solid var(--accent); opacity: 1; box-shadow: 0 8px 30px rgba(0,0,0,.18); }   /* over the centre seat, opaque: it covers nothing he needs */
   /* the sheets: songs, settings and the menu take the screen */
   html.phone .pop { left: 0 !important; right: 0 !important; top: auto !important; bottom: 0 !important; width: auto !important; max-height: 88dvh; border-radius: 16px 16px 0 0; padding-bottom: env(safe-area-inset-bottom); overflow-y: auto; -webkit-overflow-scrolling: touch; }
   html.phone .pop.songs { height: 88dvh; grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr); }
