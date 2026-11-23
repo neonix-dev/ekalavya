@@ -1081,7 +1081,7 @@ function drawPiano() {
     const fs = Math.min(k.w * (k.black ? .5 : .42), 14 * dpr); g.font = `${pc === 0 ? 700 : 600} ${fs}px -apple-system, system-ui`; g.textAlign = "center";
     g.fillStyle = down ? "#fff" : pc === 0 ? "#8B5E34" : k.black ? "#CFC6B8" : "#5E564E"; const ly = k.h - (k.black ? 8 : 12) * dpr; g.fillText(N.SW[pc], k.x + k.w / 2, ly);
     if (o) { g.beginPath(); g.arc(k.x + k.w / 2, o < 0 ? ly + 5 * dpr : ly - fs - dpr, 1.8 * dpr, 0, 7); g.fill(); }
-    if (KYS.mode === "play") { const i = k.m - lo0, cs = KYCODES[i] || [];   // the computer keys that play it, at the top of the key
+    if (KYS.mode === "play" && !PHONE) { const i = k.m - lo0, cs = KYCODES[i] || [];   // the computer keys that play it, at the top of the key
       const ks = Math.min(k.w * .34, 10 * dpr); g.font = `500 ${ks}px ui-monospace, Menlo, monospace`; g.fillStyle = down ? "#fff" : k.black ? "#9C9285" : "#A39A8D";
       cs.forEach((c, j) => g.fillText(KYS.label(c), k.x + k.w / 2, (k.black ? 6 : 8) * dpr + ks * (j + 1))); } }
 }
