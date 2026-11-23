@@ -218,6 +218,66 @@
   .st-link { display: flex; justify-content: space-between; padding: 7px 6px; border-radius: 6px; color: var(--text); text-decoration: none; font-weight: 600; }
   .st-link:hover { background: var(--subtle); } .st-link span { color: var(--text-3); }
   /* themes: Sage is the room as it was */
+
+  /* ---------- a phone: the room by touch alone. Kept: the song (chip), the three seats, the pad, a keybed a finger
+     wide, play / pause. The tanpura, the taal panel, the M32's controls and the knobs wait (song, ☰ menu, ⚙ hold them). */
+  .phone-only { display: none !important; }
+  html.phone .phone-only { display: grid !important; } html.phone .dev-only, html.phone .kb-only { display: none !important; }
+  html.phone, html.phone body { height: 100%; overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
+  html.phone body { grid-template-rows: auto minmax(0, 1fr) auto auto; height: 100dvh; padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+  html.phone .top { grid-template-columns: 1fr; grid-template-rows: auto; padding: 6px 8px 0; }
+  html.phone .tanp, html.phone .taal { display: none; }
+  html.phone .title { grid-template-columns: 1fr auto; grid-template-areas: "brand gear" "chip chip"; gap: 6px; padding: 0; }
+  html.phone .title .l { display: none; } html.phone .title .r { display: contents; }
+  html.phone .title .brand { grid-area: brand; align-items: flex-start; } html.phone .title .brand b { font-size: 19px; } html.phone .title .brand small { font-size: 8.5px; }
+  html.phone #songchip { grid-area: chip; width: 100%; min-width: 0; height: 40px; } html.phone #gear { grid-area: gear; width: 36px; height: 36px; font-size: 18px; }
+  html.phone #songchip kbd, html.phone kbd { display: none; }
+  html.phone main { grid-template-columns: 1fr 1.35fr 1fr; grid-template-rows: minmax(0, 1fr) 104px; grid-template-areas: "left center right" "pad pad pad"; gap: 6px; padding: 6px 8px; }
+  html.phone .lbox { display: none; }
+  html.phone .seat { padding: 5px 5px; gap: 4px; border-radius: 10px; }
+  html.phone .seat .head > :not(.voice) { display: none; }
+  html.phone .seat .voice { width: 100%; min-width: 0; height: 28px; font-size: 12px; }
+  html.phone .water::before, html.phone .water::after { width: 10px; }
+  html.phone .padbox { display: grid; grid-template-columns: 1fr 150px; gap: 8px; padding: 6px 8px; }
+  html.phone .padbox .info { font-size: 11px; line-height: 1.5; min-width: 0; } html.phone .padbox .info b { font-size: 14px; }
+  html.phone .padbox .pad { height: 100%; min-height: 0; touch-action: none; }
+  html.phone .puck { width: 36px; height: 36px; margin: -18px 0 0 -18px; font-size: 13px; }
+  html.phone .dock { padding: 0 8px 6px; }
+  html.phone .m32 { display: block; padding: 6px; border-radius: 12px; height: auto; } html.phone .m32-top, html.phone .m32-brand, html.phone .m32-bot > :not(.keybed) { display: none; }
+  html.phone .m32-bot { display: block; height: auto; } html.phone .keybed { height: 150px; }
+  html.phone .seat:not([data-at=center]) .hint { display: none; }
+  html.phone .water .tk, html.phone .water .vb, html.phone .water .sam em { display: none; }   /* a phone: each avartan's line and number, not the ruler */
+  html.phone footer.bottom { margin: 0 8px calc(6px + env(safe-area-inset-bottom)); height: 52px; gap: 8px; padding: 0 8px; }
+  html.phone .pos { width: auto; min-width: 0; flex: 1; overflow: hidden; } html.phone #pos { font-size: 15px; white-space: nowrap; } html.phone #pos2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+  html.phone footer .play { width: 46px; height: 46px; } html.phone footer .stop { width: 40px; height: 40px; }
+  html.phone .menu-btn { height: 40px; } html.phone footer .banner { display: none; }
+  html.phone #sound:not([hidden]) { display: block; position: fixed; left: 50%; top: 42%; transform: translate(-50%, -50%); z-index: 30; padding: 12px 18px; font-size: 15px; border-radius: 12px; pointer-events: none; box-shadow: 0 8px 30px rgba(0,0,0,.18); }
+  /* the sheets: songs, settings and the menu take the screen */
+  html.phone .pop { left: 0 !important; right: 0 !important; top: auto !important; bottom: 0 !important; width: auto !important; max-height: 88dvh; border-radius: 16px 16px 0 0; padding-bottom: env(safe-area-inset-bottom); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  html.phone .pop.songs { height: 88dvh; grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr); }
+  html.phone .pop.songs .sg-r { display: none; } html.phone .pop.songs.ed .sg-l { display: none; } html.phone .pop.songs.ed .sg-r { display: flex; overflow-y: auto; }
+  html.phone .sg-q { height: 40px; font-size: 16px; } html.phone .sg-genres button { height: 30px; padding: 0 12px; font-size: 12px; }
+  html.phone .sg-list li.it { grid-template-columns: 1fr auto; padding: 10px 12px; } html.phone .sg-list li.it b { font-size: 15px; }
+  html.phone .sg-list li.it i { display: none; } html.phone .sg-foot { display: none; }
+  .sg-edit, .sg-back { display: none; }
+  html.phone .sg-edit { display: block; grid-row: 1 / 3; grid-column: 2; align-self: center; height: 32px; padding: 0 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font: 600 12px var(--sans); color: var(--text-2); }
+  html.phone .sg-back { display: inline-flex; height: 34px; margin-bottom: 6px; }
+  html.phone .sg-r { padding: 12px 12px; } html.phone .sg-grid { grid-template-columns: 1fr; overflow: visible; }
+  html.phone .sg-grid .lab { border-top: 1px solid var(--border-light); padding: 8px 0 2px; min-height: 0; } html.phone .sg-grid .val { border-top: 0; padding: 4px 0 8px; min-height: 0; flex-wrap: wrap; }
+  html.phone .seg { flex-wrap: wrap; } html.phone .seg button { height: 34px; padding: 0 12px; }
+  html.phone .keys12 { grid-template-columns: repeat(6, 1fr); width: 100%; } html.phone .keys12 button { height: 32px; } html.phone .notes12 { grid-template-columns: repeat(6, 1fr); width: 100%; }
+  html.phone .sg-acts { position: sticky; bottom: 0; background: var(--surface); padding-bottom: 6px; } html.phone .sg-acts .btn { height: 40px; }
+  html.phone .songs .chords { white-space: normal; max-width: none; }
+  html.phone .st-row { min-height: 44px; } html.phone .sel { height: 36px; font-size: 16px; }
+  html.phone .pop.menu .mn-row { min-height: 48px; } html.phone .pop.menu .btn { height: 36px; }
+  /* a phone on its side: one row of seats and the pad, the keybed under them */
+  @media (orientation: landscape) {
+    html.phone .title { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "brand chip gear"; align-items: center; }
+    html.phone #songchip { height: 34px; }
+    html.phone main { grid-template-columns: 1fr 1.35fr 1fr 190px; grid-template-rows: minmax(0, 1fr); grid-template-areas: "left center right pad"; }
+    html.phone .padbox { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); } html.phone .padbox .info div, html.phone .padbox .info .tag { display: none; }
+    html.phone .keybed { height: 96px; } html.phone footer.bottom { height: 44px; }
+  }
   html[data-theme="night"] { --bg: #1C1F22; --surface: #262A2E; --subtle: #30353A; --subtle-2: #3A4046; --border: #454C53; --border-light: #363C42;
           --text: #E9E6DF; --text-2: #C2C5C8; --text-3: #8D9399; --accent: #A6B96B; --glow: rgba(166,185,107,.16); --now: #A6B96B; --green: #9DBB6A; --green-glow: rgba(157,187,106,.16); }
   html[data-theme="paper"] { --bg: #FFFFFF; --surface: #F5F5F3; --subtle: #EBEBE8; --subtle-2: #E0E0DC; --border: #CFCFCA; --border-light: #E3E3DF;
@@ -356,7 +416,7 @@
       <div class="hint"></div><button class="btn nowbtn" hidden>↓ now</button></div>
   </section>
   <section class="panel lbox"></section>
-  <section class="panel padbox"><div class="info"><b>Manjira · Shaker · Kit</b><div id="pad-m"></div><div id="pad-s"></div><div id="pad-k"></div><div class="tag">drag · double-click on / off</div></div>
+  <section class="panel padbox"><div class="info"><b>Manjira · Shaker · Kit</b><div id="pad-m"></div><div id="pad-s"></div><div id="pad-k"></div><div class="tag" id="pad-tag">drag · double-click on / off</div></div>
     <div class="pad" id="xy" data-box="avartan.pad"><span class="ax y">↑ loud</span><span class="ax x">complex →</span>
       <div class="puck" data-groove="manjira" data-x="0.5" data-y="0.37" data-on="0" title="Manjira: right = busier, up = louder · double-click: on / off">M</div>
       <div class="puck" data-groove="shaker" data-x="0.25" data-y="0.3" data-on="0" title="Shaker: right = busier, up = louder · double-click: on / off">S</div>
@@ -389,21 +449,22 @@
   <button class="btn menu-btn" id="menu-btn" title="everything else: Sa and tuning, zoom, the Pico, learn the M32, MIDI file">☰ Menu</button>
   <span class="banner" id="sound">click once for sound</span>
   <span style="flex:1"></span>
-  <div class="pos"><span class="name" id="pos">paused</span><span class="tag" id="pos2">space plays from sam</span></div>
+  <div class="pos"><span class="name" id="pos">paused</span><span class="tag" id="pos2"></span></div>
   <button class="stop" id="stop" title="stop everything (esc)">■</button><button class="play" id="play" data-move="play" title="play / pause (space)"><svg viewBox="0 0 24 24"><path id="play-icon" d="M8 5v14l11-7z" fill="currentColor"/></svg></button>
 </footer>
 <div class="pop menu" id="menu" hidden>
   <div class="mn-row"><span class="lab">Sa</span><div class="row"><select class="sel" id="sa"></select><span class="tag">tune</span><button class="btn sq" id="flat" title="flatter (−)">−</button><span class="num" id="cents"></span><button class="btn sq" id="sharp" title="sharper (+)">+</button></div></div>
   <div class="mn-row"><span class="lab">Zoom</span><div class="row"><button class="btn sq" id="zout" title="see more cycles (or pinch on a score)">−</button><button class="btn sq" id="zin" title="see more detail (or pinch)">+</button><button class="btn" id="zall" title="the whole session in view">all</button><button class="btn" id="zfocus" hidden title="close every phrase opened with 🔍">unfocus</button></div></div>
-  <div class="mn-row"><span class="lab">Pico</span><div class="pico" id="pico">
+  <div class="mn-row phone-only"><span class="lab">Tanpura</span><div class="row"><button class="btn" id="tanp-on2">Off</button><span class="tag">the drone; its Sa is above</span></div></div>
+  <div class="mn-row dev-only"><span class="lab">Pico</span><div class="pico" id="pico">
     <div class="pk" data-p="L2" title="press: the left seat to the centre · turn: its level"><b>L2</b><span><i data-w="L2"></i></span></div>
     <div class="pk" data-p="L" title="press: manjira on / off · turn: busier / simpler"><b>L</b><span>manjira · <i data-w="L"></i></span></div>
     <div class="pk brass" data-p="C" title="press: the song selector (turn: choose, press: select the song, then its mode) · turn: the centre's level"><b>C</b><span><i data-w="C"></i></span></div>
     <div class="pk" data-p="R" title="press: shaker on / off · turn: busier / simpler"><b>R</b><span>shaker · <i data-w="R"></i></span></div>
     <div class="pk" data-p="R2" title="press: the right seat to the centre · turn: its level"><b>R2</b><span><i data-w="R2"></i></span></div>
   </div></div>
-  <div class="mn-row"><span class="lab"></span><div class="row"><button class="btn" id="learn-pico" title="map the real Pico: turn, then press, each control L2 L C R R2 in turn">Learn Pico</button><span class="perf" id="perf"></span></div></div>
-  <div class="mn-row"><span class="lab">M32</span><div class="row"><button class="btn" id="learn" title="teach it the M32: click, then turn each real knob in turn, then the encoder">Learn</button><span class="tag">turn each knob, then the encoder</span></div></div>
+  <div class="mn-row dev-only"><span class="lab"></span><div class="row"><button class="btn" id="learn-pico" title="map the real Pico: turn, then press, each control L2 L C R R2 in turn">Learn Pico</button><span class="perf" id="perf"></span></div></div>
+  <div class="mn-row dev-only"><span class="lab">M32</span><div class="row"><button class="btn" id="learn" title="teach it the M32: click, then turn each real knob in turn, then the encoder">Learn</button><span class="tag">turn each knob, then the encoder</span></div></div>
   <div class="mn-row"><span class="lab">Export</span><div class="row"><button class="btn" id="export" title="the session so far, as a MIDI file (a channel a seat)">⬇ MIDI file</button></div></div>
 </div>
 <!-- ======================= the rotary selector: brass (C) on the Pico, or the M32's encoder -->
@@ -440,7 +501,7 @@
     <div class="sg-foot"><kbd>↑↓</kbd> choose <kbd>Enter</kbd> load <kbd>⇧Enter</kbd> load &amp; play <kbd>Tab</kbd> edit <kbd>Esc</kbd> close</div>
   </div>
   <div class="sg-r" id="sg-ed">
-    <div class="sg-head"><input class="sg-title" id="sd-title" spellcheck="false"><div class="sg-sub" id="sd-sub"></div></div>
+    <div class="sg-head"><button class="btn sg-back" id="sg-back">‹ Songs</button><input class="sg-title" id="sd-title" spellcheck="false"><div class="sg-sub" id="sd-sub"></div></div>
     <div class="sg-grid">
       <div class="lab">Mode<small>what you do</small></div><div class="val"><span class="seg" id="sd-mode"></span></div>
       <div class="lab">Key<small>Sa · tonic</small></div><div class="val"><div class="keys12" id="sd-key"></div><span class="row"><button class="btn sq" data-cents="-5">−</button><span class="num" id="sd-cents"></span><button class="btn sq" data-cents="5">+</button></span></div>
@@ -453,14 +514,15 @@
       <div class="lab">Backdrop<small>side seats, in the scale</small></div><div class="val"><span class="seg" id="sd-back"></span><span class="hint">the centre stays yours</span></div>
       <div class="lab">Percussion<small>pad</small></div><div class="val"><span class="seg" id="sd-perc"></span></div>
     </div>
-    <div class="sg-acts"><button class="btn" id="sd-save" title="keep this version in Mine">Save to Mine</button><span style="flex:1"></span><button class="btn" id="sd-load">Load</button><button class="btn go" id="sd-play">Load &amp; play ▶</button></div>
+    <div class="sg-acts"><button class="btn" id="sd-save" title="keep this version in Mine">Save to Mine</button><span style="flex:1"></span><button class="btn" id="sd-load">Load</button><button class="btn go" id="sd-play">Load &amp; play ▶&#xFE0E;</button></div>
   </div>
 </div>
 <!-- ======================= settings -->
 <div class="pop settings" id="settings" hidden>
   <div class="st-row"><span class="lab">Theme</span><select class="sel" id="theme"><option value="sage">Sage (current)</option><option value="night">Night</option><option value="paper">Paper</option></select></div>
-  <div class="st-row"><span class="lab">Keys</span><select class="sel" id="keys-mode" title="what the computer's keys do"><option value="play">Play notes (piano rows Z… and Q…)</option><option value="riyaz">Riyaz controls (no notes)</option></select></div>
-  <div class="st-row"><span class="lab">Layout</span><select class="sel" id="keys-layout" title="your keyboard's layout: only the letters drawn on the keys change"></select></div>
+  <div class="st-row"><span class="lab">Performance</span><select class="sel" id="perf-mode" title="light: fewer frames, smaller canvases, only the notes that will play are decoded (phones start light)"><option value="auto">Auto</option><option value="full">Full</option><option value="light">Light</option></select></div>
+  <div class="st-row kb-only"><span class="lab">Keys</span><select class="sel" id="keys-mode" title="what the computer's keys do"><option value="play">Play notes (piano rows Z… and Q…)</option><option value="riyaz">Riyaz controls (no notes)</option></select></div>
+  <div class="st-row kb-only"><span class="lab">Layout</span><select class="sel" id="keys-layout" title="your keyboard's layout: only the letters drawn on the keys change"></select></div>
   <div class="st-row"><span class="lab">MIDI</span><div class="row st-midi"><select class="sel" id="midi-on" title="a MIDI keyboard (and the Pico) — optional; the browser asks once"><option value="off">Off</option><option value="on">On</option></select><span class="status" id="midi">off: keys and mouse play</span></div></div>
   <div class="st-sep"></div>
   <a class="st-link" href="ai.html" target="_blank">AI guide <span>↗</span></a>
@@ -476,7 +538,15 @@
 
 <script>
 // the room is laid out in px for a 1500-wide screen; on bigger glass it grows as a whole, so the bands keep their proportions
-(function fit() { const z = Math.max(1, Math.min(2.6, Math.min(innerWidth / 1500, innerHeight / 860))); document.documentElement.style.zoom = z; document.documentElement.style.setProperty("--z", z); window.ROOM_ZOOM = z; addEventListener("resize", () => { const y = Math.max(1, Math.min(2.6, Math.min(innerWidth / 1500, innerHeight / 860))); document.documentElement.style.zoom = y; document.documentElement.style.setProperty("--z", y); window.ROOM_ZOOM = y; }); })();
+// A phone (a touch screen under 600px on its short side, or ?phone) gets its own layout at zoom 1. Light mode (phones,
+// Save-Data, small memory, or ⚙ → Performance) draws less often, at most 2 canvas pixels a point, decodes only the notes
+// that will play, and writes the AI state once a second: the room keeps time and sound first.
+window.PHONE = /[?&]phone\b/.test(location.search) || (matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 600);
+window.LITE = (() => { const p = localStorage.getItem("avartan.perf") || "auto"; if (p !== "auto") return p === "light";
+  return PHONE || !!(navigator.connection && navigator.connection.saveData) || (navigator.deviceMemory || 8) <= 4; })();
+document.documentElement.classList.toggle("phone", PHONE); document.documentElement.classList.toggle("lite", LITE);
+(function fit() { if (PHONE) { document.documentElement.style.setProperty("--z", 1); window.ROOM_ZOOM = 1; return; }
+  const z = Math.max(1, Math.min(2.6, Math.min(innerWidth / 1500, innerHeight / 860))); document.documentElement.style.zoom = z; document.documentElement.style.setProperty("--z", z); window.ROOM_ZOOM = z; addEventListener("resize", () => { const y = Math.max(1, Math.min(2.6, Math.min(innerWidth / 1500, innerHeight / 860))); document.documentElement.style.zoom = y; document.documentElement.style.setProperty("--z", y); window.ROOM_ZOOM = y; }); })();
 </script>
 <script src="voices.js"></script>
 <script src="sampler.js"></script>
@@ -493,9 +563,10 @@
 <script>
 // The room: the parts, wired to this page. The page draws from the parts' state and calls their moves; nothing more.
 (() => {
-const BR = () => devicePixelRatio || 1;                               // a canvas's pixels per screen pixel
-const DPR = () => (devicePixelRatio || 1) * (window.ROOM_ZOOM || 1);  // how big things are drawn in it (grows with the room)
+const BR = () => Math.min(devicePixelRatio || 1, LITE ? 2 : 4);      // a canvas's pixels per screen pixel (light: at most 2)
+const DPR = () => BR() * (window.ROOM_ZOOM || 1);  // how big things are drawn in it (grows with the room)
 const $ = (s, el = document) => el.querySelector(s), K = AVARTAN_CLOCK, R = AVARTAN_ROOM, N = AVARTAN_NOTATION, TB = AVARTAN_TABLA, TP = AVARTAN_TANPURA, E = AVARTAN_EAR, ST = AVARTAN_STAGE.attach(document.querySelector("#stage"));
+if (PHONE) { $("#sound").textContent = "tap once for sound"; $("#pad-tag").textContent = "drag · tap on / off"; }
 // the computer keys that play each place on the keybed (drawn on the keys)
 const KYS = window.AVARTAN_KEYS, KYCODES = []; Object.entries(KYS.PLAY).forEach(([c, i]) => (KYCODES[i] = KYCODES[i] || []).push(c));
 let lo0 = 0;
@@ -527,7 +598,12 @@ function applySa(v, c) { [tabla, TP, E].forEach(x => { x.sa = v; if ("cents" in 
 function drawSa() { const box = document.querySelector("#sa-pick"); if (!box) return;   // the tanpura's Sa: twelve buttons, the one in use lit
   if (!box.children.length) box.innerHTML = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71].map(m => `<button data-m="${m}" title="Sa = ${["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"][m % 12]}">${["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"][m % 12]}</button>`).join("");
   [...box.children].forEach(b => b.classList.toggle("on", +b.dataset.m % 12 === tabla.sa % 12)); const sel = document.querySelector("#sa"); if (sel && sel.options.length) sel.value = tabla.sa; }
-function warmAll() { if (!R.ctx) return; const ns = []; for (let m = E.sa - 12; m <= E.sa + 36; m++) ns.push(m); new Set(ST.seats.map(x => E.SOUND[x.sound])).forEach(sf => SAMPLER.warm(R.ctx, sf, ns)); }
+function warmAll() {                                // decode what will play: every seat's notes, and the keybed in the centre's sound (full: two octaves more)
+  if (!R.ctx) return; const by = new Map(), add = (sf, m) => { if (!sf || !isFinite(m)) return; if (!by.has(sf)) by.set(sf, new Set()); by.get(sf).add(m); };
+  ST.seats.forEach(x => x.notes().forEach(n => add(E.SOUND[x.sound], n.m)));
+  const c = ST.center(), csf = E.SOUND[c ? c.sound : E.sound] || E.SOUND.piano; keys().forEach(k => add(csf, k.m));
+  if (!LITE) ST.seats.forEach(x => { for (let m = E.sa - 12; m <= E.sa + 36; m++) add(E.SOUND[x.sound], m); });
+  by.forEach((ms, sf) => SAMPLER.warm(R.ctx, sf, [...ms])); }
 function applyLevels() { tabla.setLevel(levels.tabla / 100); TP.setLevel(levels.tanpura / 100); E.setLevel(levels.you / 100);
   ST.seats.forEach(x => { x.level = levels[LEVEL_OF[x.name]] / 100; x.apply(); }); manjira.setLevel(levels.manjira / 100); shaker.setLevel(levels.shaker / 100); kit.setLevel(levels.kit / 100); R.setVolume(levels.master / 100); }
 applyTaal(); applySa(sa, cents); applyLevels();
@@ -573,13 +649,14 @@ function fadeTanpura() { if (!TP.on) { const v = levels.tanpura; TP.setLevel(0);
   else if (TP.bus) { TP.bus.gain.gain.setTargetAtTime(.0001, R.ctx.currentTime, 1); setTimeout(() => { TP.toggle(); TP.setLevel(levels.tanpura / 100); }, 3500); } }
 
 // ---------------------------------------------------------------- wiring the controls
-addEventListener("pointerdown", () => { const fresh = !R.ctx; R.open(); if (fresh) warmAll(); }, {capture: true, once: false});
+const unlock = () => { const fresh = !R.ctx; R.open(); if (fresh) warmAll(); };   // iOS opens sound on touchend / click
+["pointerdown", "touchend", "click"].forEach(t => addEventListener(t, unlock, {capture: true}));
 document.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b && e.detail > 0) b.blur(); });
 $("#play").onclick = moves.play; $("#stop").onclick = moves.stopAll;
 $("#hold").onclick = moves.hold; $("#next").onclick = moves.next; $("#tihai").onclick = moves.tihai; $("#tap").onclick = moves.tap;
 $("#slower").onclick = (e) => moves.slower({shift: e.shiftKey}); $("#faster").onclick = (e) => moves.faster({shift: e.shiftKey});
 $("#flat").onclick = (e) => moves.flatter({ctrl: e.ctrlKey}); $("#sharp").onclick = (e) => moves.sharper({ctrl: e.ctrlKey});
-$("#tanp-on").onclick = moves.tanpura;
+$("#tanp-on").onclick = moves.tanpura; $("#tanp-on2").onclick = moves.tanpura;
 $("#tanp-first").value = TP.first; $("#tanp-first").onchange = (e) => { TP.first = e.target.value; save(); e.target.blur(); };
 tabla.feelAmount = store.feel ?? .6; $("#feel").value = Math.round(tabla.feelAmount * 100);
 $("#feel").oninput = (e) => { tabla.feelAmount = +e.target.value / 100; save(); };
@@ -666,7 +743,7 @@ function applySong(d, play, mode) {
   applyBeat(d); if (d.drone === "off" && TP.on) TP.toggle();   // chord songs sound cleaner without the drone
   const g = GENRES[genreOf(d.genre || "")] || {};
   ["manjira", "shaker"].forEach(k => door.pad(k, {...(g[k] || {x: .3, y: .4}), on: mode === k ? false : mode === "listen" ? true : !!d[k]}));
-  CUR = d.title; drawChip(); drawOled(); save();
+  CUR = d.title; drawChip(); drawOled(); save(); if (R.ctx) setTimeout(warmAll, 0);
   if (play) moves.play();
 }
 // the header's song chip, and its popover: quick pick (search, genres, the list) · edit and play (the draft's parameters)
@@ -686,7 +763,7 @@ function drawList() {
   SG.focus = Math.max(0, Math.min(SG.focus, SG.list.length - 1));
   let html = "", last = null;
   SG.list.forEach((x, i) => { const g = gOf(x); if (g !== last) { html += `<li class="grp">${g}</li>`; last = g; }
-    const d = draftOf(x); html += `<li class="it${i === SG.focus ? " focus" : ""}${x.title === CUR ? " cur" : ""}" data-i="${i}"><b>${esc(x.title)}</b><i>${x.title === CUR ? "● loaded" : ""}</i><span>${esc(d.raga || d.scale)} · ${esc(d.meter || taalName(d.taal))} · ${d.bpm} bpm · ${keyName(d)}</span></li>`; });
+    const d = draftOf(x); html += `<li class="it${i === SG.focus ? " focus" : ""}${x.title === CUR ? " cur" : ""}" data-i="${i}"><b>${esc(x.title)}</b><i>${x.title === CUR ? "● loaded" : ""}</i><button class="sg-edit" data-ed="${i}" title="edit, then load">Edit ›</button><span>${esc(d.raga || d.scale)} · ${esc(d.meter || taalName(d.taal))} · ${d.bpm} bpm · ${keyName(d)}</span></li>`; });
   $("#sg-list").innerHTML = html || `<li class="empty">No song matches “${esc(SG.q)}”.</li>`;
   const f = $("#sg-list li.it.focus"); if (f) f.scrollIntoView({block: "nearest"});
   if (SG.list[SG.focus]) { SG.draft = draftOf(SG.list[SG.focus]); drawEd(); }
@@ -736,7 +813,9 @@ $("#sd-play").onclick = () => { applySong(SG.draft, true); closePops(); };
 $("#sd-save").onclick = () => { const d = {...SG.draft}; delete d.mine; const m = mine().filter(x => x.title !== d.title); m.unshift(d); localStorage.setItem(MINE_KEY, JSON.stringify(m)); SG.genre = "mine"; SG.focus = 0; drawList(); };
 $("#sg-q").oninput = (e) => { SG.q = e.target.value; SG.focus = 0; drawList(); };
 $("#sg-genres").onclick = (e) => { const b = e.target.closest("button"); if (b) { SG.genre = b.dataset.g; SG.focus = 0; drawList(); $("#sg-q").focus(); } };
-$("#sg-list").onclick = (e) => { const li = e.target.closest("li.it"); if (!li) return; applySong(draftOf(SG.list[+li.dataset.i]), false); closePops(); };
+$("#sg-list").onclick = (e) => { const ed = e.target.closest("[data-ed]");
+  if (ed) { SG.focus = +ed.dataset.ed; SG.draft = draftOf(SG.list[SG.focus]); drawEd(); $("#songs").classList.add("ed"); $("#sg-ed").scrollTop = 0; return; }   // a phone: the editor takes the sheet
+  const li = e.target.closest("li.it"); if (!li) return; applySong(draftOf(SG.list[+li.dataset.i]), false); closePops(); };
 $("#sg-list").onmousemove = (e) => { const li = e.target.closest("li.it"); if (li && +li.dataset.i !== SG.focus) { SG.focus = +li.dataset.i; $$("#sg-list li.it").forEach(x => x.classList.toggle("focus", x === li)); SG.draft = draftOf(SG.list[SG.focus]); drawEd(); } };
 $("#songs").addEventListener("keydown", (e) => { e.stopPropagation();
   if (e.key === "Escape") return closePops();
@@ -746,8 +825,9 @@ $("#songs").addEventListener("keydown", (e) => { e.stopPropagation();
   if (e.key === "Tab" && !e.shiftKey) { e.preventDefault(); $("#sd-title").focus(); } });
 function closePops() { $("#songs").hidden = true; $("#settings").hidden = true; $("#menu").hidden = true; $("#menu-btn").classList.remove("open"); $("#songchip").classList.remove("open"); $("#gear").classList.remove("open"); }
 function openSongs() { const was = !$("#songs").hidden; closePops(); if (was) return; $("#songs").hidden = false; $("#songchip").classList.add("open");
-  SG.q = ""; $("#sg-q").value = ""; SG.genre = "all"; SG.focus = 0; drawList(); const i = SG.list.findIndex(x => x.title === CUR); if (i > 0) { SG.focus = i; drawList(); } $("#sg-q").focus(); }
+  SG.q = ""; $("#sg-q").value = ""; SG.genre = "all"; SG.focus = 0; drawList(); const i = SG.list.findIndex(x => x.title === CUR); if (i > 0) { SG.focus = i; drawList(); } $("#songs").classList.remove("ed"); if (!PHONE) $("#sg-q").focus(); }   // a phone: no keyboard popping up
 $("#songchip").onclick = openSongs;
+$("#sg-back").onclick = () => $("#songs").classList.remove("ed");
 $("#gear").onclick = () => { const was = !$("#settings").hidden; closePops(); if (!was) { $("#settings").hidden = false; $("#gear").classList.add("open"); } };
 document.addEventListener("pointerdown", (e) => { if (!e.target.closest(".pop, #songchip, #gear, #menu-btn")) closePops(); });
 $("#settings").addEventListener("keydown", (e) => { e.stopPropagation(); if (e.key === "Escape") closePops(); });
@@ -795,10 +875,13 @@ function placePuck(el) { const g = GROOVES[el.dataset.groove], x = +el.dataset.x
 document.querySelectorAll(".puck").forEach(placePuck);
 new MutationObserver((ms) => ms.forEach(m => placePuck(m.target))).observe($("#xy"), {attributes: true, subtree: true, attributeFilter: ["data-x", "data-y", "data-on"]});
 let puckDrag = null;
-$("#xy").addEventListener("pointerdown", (e) => { const el = e.target.closest(".puck"); if (!el) return; el.setPointerCapture(e.pointerId); puckDrag = el; });
-$("#xy").addEventListener("pointermove", (e) => { if (!puckDrag) return; const r = $("#xy").getBoundingClientRect(), cl = (v) => Math.max(0, Math.min(1, v));
+// drag a puck to move it; on a touch screen a tap (no drag) turns it on / off (a mouse double-clicks)
+let puckFrom = null;
+$("#xy").addEventListener("pointerdown", (e) => { const el = e.target.closest(".puck"); if (!el) return; e.preventDefault(); try { el.setPointerCapture(e.pointerId); } catch (_) {} puckDrag = el; puckFrom = {x: e.clientX, y: e.clientY, moved: e.pointerType === "mouse"}; });
+$("#xy").addEventListener("pointermove", (e) => { if (!puckDrag) return; if (!puckFrom.moved) { if (Math.hypot(e.clientX - puckFrom.x, e.clientY - puckFrom.y) < 8) return; puckFrom.moved = true; } const r = $("#xy").getBoundingClientRect(), cl = (v) => Math.max(0, Math.min(1, v));
   puckDrag.dataset.x = cl((e.clientX - r.left) / r.width).toFixed(3); puckDrag.dataset.y = cl(1 - (e.clientY - r.top) / r.height).toFixed(3); if (puckDrag.dataset.on !== "1") puckDrag.dataset.on = "1"; });
-$("#xy").addEventListener("pointerup", () => puckDrag = null);
+$("#xy").addEventListener("pointerup", (e) => { if (puckDrag && puckFrom && !puckFrom.moved) puckDrag.dataset.on = puckDrag.dataset.on === "1" ? "0" : "1"; puckDrag = null; puckFrom = null; });
+$("#xy").addEventListener("pointercancel", () => { puckDrag = null; puckFrom = null; });
 $("#xy").addEventListener("dblclick", (e) => { const el = e.target.closest(".puck"); if (el) el.dataset.on = el.dataset.on === "1" ? "0" : "1"; });
 $("#vars").addEventListener("change", (e) => { const i = +e.target.dataset.i; tabla.setChecked(i, e.target.checked); });
 // the mixer
@@ -983,8 +1066,10 @@ E.on((e) => {
 
 // ---------------------------------------------------------------- the piano: 3 octaves from mandra Sa, labelled in sargam
 const cv = $("#piano"), g = cv.getContext("2d"), isBlack = (m) => [1, 3, 6, 8, 10].includes(((m % 12) + 12) % 12);
-function keys() { const lo = 12 * Math.floor((E.sa - 12) / 12), hi = lo + 31,   // the M32's 32 keys, C to G, under mandra Sa
-  W = cv.width, H = cv.height, whites = []; for (let m = lo; m <= hi; m++) if (!isBlack(m)) whites.push(m);
+function keys() { let lo = 12 * Math.floor((E.sa - 12) / 12), hi = lo + 31;     // the M32's 32 keys, C to G, under mandra Sa
+  if (PHONE) { const w = cv.clientWidth || 360, n = Math.max(8, Math.min(19, Math.round(w / 30)));   // a phone: keys a finger wide, from the Pa below Sa
+    lo = E.sa - 5; while (isBlack(lo)) lo--; hi = lo; for (let k = 1; k < n; ) { hi++; if (!isBlack(hi)) k++; } }
+  const W = cv.width, H = cv.height, whites = []; for (let m = lo; m <= hi; m++) if (!isBlack(m)) whites.push(m);
   const ww = W / whites.length, out = []; for (let m = lo; m <= hi; m++) { if (!isBlack(m)) out.push({m, x: whites.indexOf(m) * ww, w: ww, h: H, black: false}); else { const i = whites.indexOf(m - 1); if (i >= 0) out.push({m, x: (i + 1) * ww - ww * .3, w: ww * .6, h: H * .6, black: true}); } } return out; }
 function drawPiano() {
   const r = cv.getBoundingClientRect(), br = BR(), dpr = DPR(); if (cv.width !== Math.round(r.width * br) || cv.height !== Math.round(r.height * br)) { cv.width = Math.round(r.width * br); cv.height = Math.round(r.height * br); }
@@ -1000,11 +1085,15 @@ function drawPiano() {
       const ks = Math.min(k.w * .34, 10 * dpr); g.font = `500 ${ks}px ui-monospace, Menlo, monospace`; g.fillStyle = down ? "#fff" : k.black ? "#9C9285" : "#A39A8D";
       cs.forEach((c, j) => g.fillText(KYS.label(c), k.x + k.w / 2, (k.black ? 6 : 8) * dpr + ks * (j + 1))); } }
 }
-let mouseKey = null; const keyAt = (e) => { const r = cv.getBoundingClientRect(), br = BR(), x = (e.clientX - r.left) * br, y = (e.clientY - r.top) * br, ks = keys();
+const keyAt = (e) => { const r = cv.getBoundingClientRect(), br = BR(), x = (e.clientX - r.left) * br, y = (e.clientY - r.top) * br, ks = keys();
   return ks.filter(k => k.black).find(k => x >= k.x && x <= k.x + k.w && y <= k.h) || ks.find(k => !k.black && x >= k.x && x <= k.x + k.w) || null; };
-cv.addEventListener("pointerdown", (e) => { const k = keyAt(e); if (!k) return; cv.setPointerCapture(e.pointerId); mouseKey = k.m; E.noteOn(k.m, .7); });
-cv.addEventListener("pointermove", (e) => { if (mouseKey === null) return; const k = keyAt(e); if (k && k.m !== mouseKey) { E.noteOff(mouseKey); mouseKey = k.m; E.noteOn(k.m, .7); } });
-const up = () => { if (mouseKey !== null) { E.noteOff(mouseKey); mouseKey = null; } }; cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+// each finger (or the mouse) holds its own key; sliding moves it to the next key
+const fingers = new Map();
+cv.addEventListener("pointerdown", (e) => { const k = keyAt(e); if (!k) return; e.preventDefault(); unlock(); try { cv.setPointerCapture(e.pointerId); } catch (_) {} fingers.set(e.pointerId, k.m); E.noteOn(k.m, .7); });
+cv.addEventListener("pointermove", (e) => { if (!fingers.has(e.pointerId)) return; const k = keyAt(e), m = fingers.get(e.pointerId);
+  if (k && k.m !== m) { if (![...fingers.values()].filter(x => x === m).slice(1).length) E.noteOff(m); fingers.set(e.pointerId, k.m); E.noteOn(k.m, .7); } });
+const up = (e) => { if (!fingers.has(e.pointerId)) return; const m = fingers.get(e.pointerId); fingers.delete(e.pointerId); if (![...fingers.values()].includes(m)) E.noteOff(m); };
+cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up); cv.addEventListener("contextmenu", (e) => e.preventDefault());
 E.on((e) => { if (e.type === "inputs") { $("#midi").textContent = e.names.length ? "MIDI · " + e.names.join(", ") : "no MIDI keyboard"; $("#midi").className = "status" + (e.names.length ? " ok" : ""); } });
 // MIDI is the visitor's choice (⚙): off, the keys and the mouse play and the browser never asks; on, it asks once.
 // On this machine (localhost) it starts on, for the M32 and the Pico.
@@ -1012,7 +1101,9 @@ const midiChoice = localStorage.getItem("avartan.midi") || (/^(localhost|127\.0\
 let midiAsked = false;
 function startMidi() { if (midiAsked) return; midiAsked = true; $("#midi").textContent = "asking the browser…"; $("#midi").className = "status";
   E.midi().then(r => { if (r === null) $("#midi").textContent = "this browser has no MIDI (Chrome or Edge do)"; }).catch(() => { midiAsked = false; $("#midi").textContent = "MIDI blocked: allow it in the address bar"; }); }
-$("#midi-on").value = midiChoice; if (midiChoice === "on") startMidi();
+$("#midi-on").value = midiChoice; if (!navigator.requestMIDIAccess) { $("#midi-on").disabled = true; $("#midi-on").value = "off"; $("#midi").textContent = "not in this browser: touch and keys play"; } else if (midiChoice === "on") startMidi();
+{ const pm = $("#perf-mode"); pm.value = localStorage.getItem("avartan.perf") || "auto"; pm.options[0].textContent = "Auto (" + (LITE ? "light" : "full") + " here)";
+  pm.onchange = () => { localStorage.setItem("avartan.perf", pm.value); location.reload(); }; }
 $("#midi-on").onchange = (e) => { localStorage.setItem("avartan.midi", e.target.value); if (e.target.value === "on") startMidi(); else location.reload(); };   // off lets go of the ports
 
 // ---------------------------------------------------------------- the water: each seat's score, the DOM itself, floating up
@@ -1064,7 +1155,7 @@ function drawSeat(x) {
   const nowB = K.B(); x.lit = x.lit || new Set(); const on = new Set();
   if (K.running) { let lo = 0, hi = ns.length; while (lo < hi) { const mid = (lo + hi) >> 1; if (ns[mid].B < nowB - 16) lo = mid + 1; else hi = mid; } for (let i = lo; i < ns.length && ns[i].B <= nowB; i++) if (ns[i].B + ns[i].d > nowB) on.add(ns[i].li); }
   x.lit.forEach(li => { if (!on.has(li)) li.classList.remove("now"); }); on.forEach(li => li.classList.add("now")); x.lit = on;
-  const hint = !ns.length ? (x.at === "center" ? (K.running ? "play: your notes float up from the keys" : "press space, then play on your keyboard") : "its score moves with it · ◀ centre ▶ to bring it in") : "";
+  const hint = !ns.length ? (x.at === "center" ? (K.running ? "play: your notes float up from the keys" : (PHONE ? "tap ▶\uFE0E, then play the keys below" : "press space, then play on your keyboard")) : "its score moves with it · ◀ centre ▶ to bring it in") : "";
   const hEl = $(".hint", w); if (hEl.textContent !== hint) hEl.textContent = hint;
   $(".nowbtn", w).hidden = back < 4;
   // pins: chips riding their phrase, stuck at the top when they get there
@@ -1107,7 +1198,10 @@ $("#zall").onclick = () => { const c = ST.center(), H = c ? $(".water", c.el).cl
 
 // ---------------------------------------------------------------- drawing (from the parts' state)
 const keyOf = {}; const once = (k, v, f) => { if (keyOf[k] !== v) { keyOf[k] = v; f(); } };
-function frame() {
+let lastFrame = 0;
+function frame(ts = performance.now()) {
+  if (LITE && ts - lastFrame < 32) return requestAnimationFrame(frame);    // light: about 30 frames a second
+  lastFrame = ts;
   const s = tabla.state(), t = s.taal, beat = s.playing ? s.beat : -1;
   // the top band
   once("steps", t.key, () => { const st = TB.startsOf(t); $("#steps").innerHTML = t.vibhag.map((v, i) => `<div class="v">` + Array.from({length: v}, (_, k) => `<div class="m"><i>${k ? "" : t.marks[i]}</i><span></span></div>`).join("") + `</div>`).join(""); keyOf.stepline = null; });
@@ -1121,7 +1215,7 @@ function frame() {
   $("#hold").classList.toggle("on", s.held); $("#tihai").classList.toggle("armed", s.tihaiArmed); $("#bpm").textContent = s.bpm;
   const ln = [...$("#laya-name").options].find(o => o.value && Math.abs(+o.value - s.bpm) < 1); $("#laya-name").value = ln ? ln.value : "";
   $("#cents").textContent = (s.cents >= 0 ? "+" : "") + s.cents + "¢"; $("#t-taal").textContent = t.name + " · " + t.beats + (s.playing ? " · " + s.bpm + " bpm" : "");
-  $("#tanp-on").innerHTML = (TP.on ? "On" : "Off") + " <kbd>D</kbd>"; $("#tanp-on").classList.toggle("on", TP.on);
+  $("#tanp-on").innerHTML = (TP.on ? "On" : "Off") + " <kbd>D</kbd>"; $("#tanp-on").classList.toggle("on", TP.on); $("#tanp-on2").textContent = TP.on ? "On" : "Off"; $("#tanp-on2").classList.toggle("on", TP.on);
   // the stage: where the cycle is (on the element, for any reader), then each seat
   const now = ST.now(), sd = $("#stage").dataset, put = (k, v) => { v = String(v); if (sd[k] !== v) sd[k] = v; };
   put("cycle", now.cycle); put("beat", now.beat); put("beats", now.beats); put("running", now.running ? 1 : 0); put("bpm", now.bpm); put("sa", now.sa);
@@ -1141,7 +1235,7 @@ function frame() {
   document.querySelectorAll("#pico [data-w]").forEach(i => { if (i.textContent !== String(PW[i.dataset.w])) i.textContent = PW[i.dataset.w]; });
   $("#play-icon").setAttribute("d", K.running ? "M6 5h4v14H6zM14 5h4v14h-4z" : "M8 5v14l11-7z");
   $("#pos").innerHTML = s.playing ? `${s.beat + 1} / ${t.beats} · <i style="color:var(--accent)">${esc((TB.matras(s.line, t.beats)[s.beat] || "").replace(/-/g, "").replace(/\./g, ""))}</i>` : "paused";
-  $("#pos2").textContent = s.playing ? `avartan ${s.cycle} · ${s.bpm} bpm` : "space plays from sam";
+  $("#pos2").textContent = s.playing ? `avartan ${s.cycle} · ${s.bpm} bpm` : (PHONE ? "▶\uFE0E plays from sam" : "space plays from sam");
   $("#sound").hidden = R.running();
   drawPiano();
   requestAnimationFrame(frame);
@@ -1153,7 +1247,7 @@ const plain = (x) => ({c: x.c, at: +x.at.toFixed(3), m: x.m, swar: N.swarOf(x.m 
 setInterval(() => { const s = tabla.state();
   $("#ai-state").textContent = JSON.stringify({now: ST.now(), taal: s.taal.name, vibhag: s.taal.vibhag, sa: NAMES[tabla.sa % 12], tabla: {name: s.name, program: s.program, rows: s.rows},
     seats: ST.seats.map(x => ({...x.state(), phrases: x.phrases().slice(-8)})), pins: pins().map(({name, seat, from, to}) => ({name, seat, from, to})),
-    pad: [...document.querySelectorAll(".puck")].map(p => ({groove: p.dataset.groove, x: +p.dataset.x, y: +p.dataset.y, on: p.dataset.on === "1"}))}); }, 250);
+    pad: [...document.querySelectorAll(".puck")].map(p => ({groove: p.dataset.groove, x: +p.dataset.x, y: +p.dataset.y, on: p.dataset.on === "1"}))}); }, LITE ? 1000 : 250);
 // The stable JS door: the same moves as writing the DOM yourself (each writes the DOM; nothing here the DOM cannot do).
 // Names stay the same from build to build.
 const seatOf = (name) => { const x = ST.seat(name) || ST.atPlace(name); if (!x) throw new Error("no seat " + name + " (seats: " + ST.seats.map(s => s.name).join(", ") + "; or left / center / right)"); return x; };

@@ -59,3 +59,24 @@ notes (QWERTY by default; ⚙ → Layout).
 
 MusyngKite soundfont via midi-js-soundfonts (https://github.com/gleitz/midi-js-soundfonts), CC BY-SA 3.0, in ⚙. Tabla,
 tanpura and drum kit synthesised in the page. Fonts: Cormorant Garamond and DM Mono via Google Fonts.
+
+## Follow-up: an iPhone, under reduced capacity, by touch alone
+
+Ask: `ask.ekalavya.iphone.01`. neonix accepted PR #2 with a caveat: a follow-up PR that ensures the site loads under
+reduced capacity on an iPhone, and works with no connected device, by touch. Source: `avartan` at `0fa735a`.
+
+- **A phone layout** (a touch screen whose short side is under 600px; `?phone` forces it): the song chip, the three
+  seats, the pad, a keybed a finger wide (from the Pa below Sa, 8–19 keys by width), ☰ Menu, ■ and ▶. The tanpura
+  and taal panels, the M32's controls and the knobs wait: the song sets them, the tanpura switch is in ☰, levels are
+  the phone's volume. On its side: one row of seats and the pad, the keybed under them.
+- **Touch:** each finger holds its own key and can slide; a tap turns a pad puck on or off, a drag moves it. Songs,
+  settings and the menu rise as sheets from the bottom; in songs a tap loads, **Edit ›** opens the editor, **‹ Songs**
+  goes back. No keyboard pops up.
+- **No device:** iPhone Safari has no Web MIDI; ⚙ says so and the MIDI choice is off. Pico and M32 rows are hidden on
+  a phone; the computer-keyboard rows (Keys, Layout) too.
+- **Reduced capacity, light mode** (phones, Save-Data, 4 GB or less, or ⚙ → Performance → Light): about 30 frames a
+  second, canvases at most 2 pixels a point, the AI state once a second, and only the notes that will play are decoded.
+  Measured on Stand By Me after the first touch: 55 notes decoded (0.9 MB of audio) against 261 (4.8 MB) in full.
+  The tabla, tanpura and drum kit are synthesised, so the room keeps time before any instrument file arrives.
+- **iOS sound:** opens on touchend and click as well as pointerdown; `navigator.audioSession.type = "playback"` so
+  it sounds with the silent switch on; ▶ drawn as text, not emoji.
